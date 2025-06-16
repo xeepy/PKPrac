@@ -1,0 +1,114 @@
+/*
+ * PKPrac - A parkour practice mod
+ * Copyright (C) 2025 xeepy
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ */
+package com.xekek.pkprac.events;
+
+import com.xekek.pkprac.client.ChatCommands;
+import com.xekek.pkprac.modules.PracticeMode;
+import io.netty.channel.*;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.entity.EntityPlayerSP;
+import net.minecraft.network.play.client.*;
+import net.minecraft.network.play.server.S08PacketPlayerPosLook;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.network.FMLNetworkEvent;
+
+
+import static com.xekek.pkprac.modules.PracticeMode.*;
+
+public class Packets {
+
+    public static int tickCounter = 0;
+    private int lastTick = -1;
+    private static int practiceTickCounter = 0;
+    private static boolean needsPositionSync = false;
+
+    private static Minecraft mc = Minecraft.getMinecraft();
+
+    @SubscribeEvent
+    public void onClientConnect(FMLNetworkEvent.ClientConnectedToServerEvent event) {
+        event.manager.channel().pipeline().addBefore("packet_handler", "outbound",
+                new ChannelOutboundHandlerAdapter() {
+                    @Override
+                    public void write(ChannelHandlerContext ctx, Object msg, ChannelPromise promise) throws Exception {
+
+                        EntityPlayerSP player = mc.thePlayer;
+                        int currentTick = player != null ? player.ticksExisted : -1;                        if (msg instanceof C03PacketPlayer && lastTick != currentTick) {
+                            tickCounter++;
+                            if (tickCounter >= 21) {
+                                tickCounter = 0;
+                            }
+                            lastTick = currentTick;
+
+                            if (PracticeMode.isPracticeModeEnabled()) {
+                                practiceTickCounter++;
+                                if (practiceTickCounter >= 21) {
+                                    practiceTickCounter = 0;
+                                    needsPositionSync = true;
+                                }
+                            }
+                        }
+                        if (msg instanceof C01PacketChatMessage) {
+                            String message = ((C01PacketChatMessage) msg).getMessage();
+                            if (ChatCommands.handleChatCommand(message)) {
+                                return;
+                            }
+                        }
+
+                        if (PracticeMode.isPracticeModeEnabled()) {
+                            if (player == null) {
+                                super.write(ctx, msg, promise);
+                                return;
+                            }                            if (msg instanceof C03PacketPlayer) {
+                                if (needsPositionSync) {
+                                    super.write(ctx, new C03PacketPlayer.C04PacketPlayerPosition(
+                                            savedX, savedY, savedZ, true), promise);
+                                    needsPositionSync = false;
+                                } else {
+                                    super.write(ctx, new C03PacketPlayer(true), promise);
+                                }
+                                return;
+                            }
+
+                            if (msg instanceof C0BPacketEntityAction || msg instanceof C13PacketPlayerAbilities || msg instanceof C09PacketHeldItemChange
+                                    || msg instanceof C0APacketAnimation
+                                    || msg instanceof C07PacketPlayerDigging
+                                    || msg instanceof C08PacketPlayerBlockPlacement
+                                    || msg instanceof S08PacketPlayerPosLook
+                                    || msg instanceof C02PacketUseEntity) {
+                                return;
+                            }
+                        }
+
+                        super.write(ctx, msg, promise);
+
+                    }
+                });
+
+    }    @SubscribeEvent
+    public void onClientDisconnect(FMLNetworkEvent.ClientDisconnectionFromServerEvent event) {
+        tickCounter = 0;
+        lastTick = -1;
+        practiceTickCounter = 0;
+        needsPositionSync = false;
+    }
+
+    public static void resetPracticeSync() {
+        practiceTickCounter = 0;
+        needsPositionSync = true;
+    }
+}
