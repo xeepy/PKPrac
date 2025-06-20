@@ -45,11 +45,9 @@ public class Main
     public static final String MODID = "PKPrac";
     public static final String VERSION = "1.0.0";
 
-    private static float lastHealth = 20.0f;
     private static int lastHurtTime = 0;
     public static boolean needsResync = false;
 
-    private static double lastX, lastY, lastZ;
     private static String lastWorldName = "";
     private static boolean firstTick = true;
 
@@ -61,6 +59,7 @@ public class Main
 
     Beams beams = new Beams();
 
+
     public static float getGifScale() {
         if (gifRenderer != null) return gifRenderer.getScale();
         return ParkourSettings.gifScale;
@@ -70,6 +69,16 @@ public class Main
         ParkourSettings.gifScale = scale;
         if (gifRenderer != null) gifRenderer.setScale(scale);
         Config.saveSettings();
+    }
+
+    public static void reloadGifRenderer() {
+        if (gifRenderer != null) {
+            net.minecraftforge.common.MinecraftForge.EVENT_BUS.unregister(gifRenderer);
+        }
+        gifRenderer = new GifRenderer(
+            GuiParkourSettings.getSelectedGifPath()
+        );
+        net.minecraftforge.common.MinecraftForge.EVENT_BUS.register(gifRenderer);
     }
 
 
@@ -85,8 +94,7 @@ public class Main
     public void init(FMLInitializationEvent event)
     {
         Config.loadSettings();
-        gifRenderer = new GifRenderer("main.gif");
-        MinecraftForge.EVENT_BUS.register(gifRenderer);
+        reloadGifRenderer();
         MinecraftForge.EVENT_BUS.register(new Packets());
         MinecraftForge.EVENT_BUS.register(new PracticeMode());
         MinecraftForge.EVENT_BUS.register(new EventHandler());
@@ -97,12 +105,15 @@ public class Main
 
     @SubscribeEvent
     public void onClientConnect(FMLNetworkEvent.ClientConnectedToServerEvent event) {
-        Notifications.add("Connected to server: " + event.manager.getRemoteAddress(), Notifications.NotificationType.INFO);
     }
     @SubscribeEvent
     public void onClientDisconnect(FMLNetworkEvent.ClientDisconnectionFromServerEvent event) {
-        Notifications.add("Disconnected from server: " + event.manager.getRemoteAddress(), Notifications.NotificationType.INFO);
         PracticeMode.shutdown();
+        Config.saveSettings();
+        if (gifRenderer != null) {
+            MinecraftForge.EVENT_BUS.unregister(gifRenderer);
+            gifRenderer = null;
+        }
     }
 
     @SubscribeEvent
@@ -185,16 +196,12 @@ public class Main
                     Notifications.add(reason, Notifications.NotificationType.WARNING);
                     needsResync = true;
                 }
-                lastHealth = player.getHealth();
                 lastHurtTime = player.hurtTime;
             } else {
                 needsResync = false;
                 blockStatesInitialized = false;
             }
 
-            lastX = player.posX;
-            lastY = player.posY;
-            lastZ = player.posZ;
             lastWorldName = currentWorldName;
             firstTick = false;
 

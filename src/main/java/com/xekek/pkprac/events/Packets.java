@@ -18,7 +18,9 @@
 package com.xekek.pkprac.events;
 
 import com.xekek.pkprac.client.ChatCommands;
+import com.xekek.pkprac.modules.CPManager;
 import com.xekek.pkprac.modules.PracticeMode;
+import com.xekek.pkprac.renderer.Notifications;
 import io.netty.channel.*;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
@@ -47,7 +49,8 @@ public class Packets {
                     public void write(ChannelHandlerContext ctx, Object msg, ChannelPromise promise) throws Exception {
 
                         EntityPlayerSP player = mc.thePlayer;
-                        int currentTick = player != null ? player.ticksExisted : -1;                        if (msg instanceof C03PacketPlayer && lastTick != currentTick) {
+                        int currentTick = player != null ? player.ticksExisted : -1;
+                        if (msg instanceof C03PacketPlayer && lastTick != currentTick) {
                             tickCounter++;
                             if (tickCounter >= 21) {
                                 tickCounter = 0;
@@ -73,7 +76,8 @@ public class Packets {
                             if (player == null) {
                                 super.write(ctx, msg, promise);
                                 return;
-                            }                            if (msg instanceof C03PacketPlayer) {
+                            }
+                            if (msg instanceof C03PacketPlayer) {
                                 if (needsPositionSync) {
                                     super.write(ctx, new C03PacketPlayer.C04PacketPlayerPosition(
                                             savedX, savedY, savedZ, true), promise);
@@ -96,6 +100,35 @@ public class Packets {
 
                         super.write(ctx, msg, promise);
 
+                    }
+                });
+
+        event.manager.channel().pipeline().addBefore("packet_handler", "inbound",
+                new ChannelInboundHandlerAdapter() {
+                    @Override
+                    public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
+
+                        if (msg instanceof S08PacketPlayerPosLook && PracticeMode.isPracticeModeEnabled()) {
+                            S08PacketPlayerPosLook packet = (S08PacketPlayerPosLook) msg;
+
+                            if (CPManager.isCheckpointTeleporting || PracticeMode.justTeleported) {
+                                super.channelRead(ctx, msg);
+                                return;
+                            }
+
+                            double distance = Math.sqrt(
+                                Math.pow(packet.getX() - savedX, 2) +
+                                Math.pow(packet.getY() - savedY, 2) +
+                                Math.pow(packet.getZ() - savedZ, 2)
+                            );
+
+                            if (distance > 1.0) {
+                                Notifications.add("Something's gone wrong! Resyncing", Notifications.NotificationType.WARNING);
+                                PracticeMode.handleServerTeleport(packet.getX(), packet.getY(), packet.getZ());
+                            }
+                        }
+
+                        super.channelRead(ctx, msg);
                     }
                 });
 

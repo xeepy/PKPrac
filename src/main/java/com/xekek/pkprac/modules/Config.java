@@ -26,7 +26,6 @@ import net.minecraft.client.Minecraft;
 
 public class Config {
 
-
     private static final File DIR = new File(Minecraft.getMinecraft().mcDataDir, "pkprac");
     private static final String CONFIG_FILE = new File(DIR, "parkourmod_settings.cfg").getAbsolutePath();
 
@@ -36,6 +35,22 @@ public class Config {
 
     private static boolean saveCheckpointOnActivation = ParkourSettings.saveCheckpointOnActivation;
     private static float gifScale = ParkourSettings.gifScale;
+    private static int selectedGifStyle = 0;
+
+    public static int getSelectedGifStyle() {
+        return selectedGifStyle;
+    }
+    public static void setSelectedGifStyle(int idx) {
+        selectedGifStyle = idx;
+    }
+    public static float getGifScale() {
+        return gifScale;
+    }
+    public static void setGifScale(float scale) {
+        gifScale = scale;
+        ParkourSettings.gifScale = scale;
+        saveSettings();
+    }
 
     public static void saveSettings() {
         try {
@@ -43,6 +58,8 @@ public class Config {
             FileWriter writer = new FileWriter(file);
             writer.write("saveCheckpointOnActivation=" +  saveCheckpointOnActivation  + "\n");
             writer.write("gifScale=" + gifScale + "\n");
+            writer.write("selectedGifStyle=" + selectedGifStyle + "\n");
+            writer.write("toggleBeams=" + ParkourSettings.toggleBeams + "\n");
             writer.close();
         } catch (IOException e) {
             System.out.println("[ParkourMod] Failed to save settings: " + e.getMessage());
@@ -62,6 +79,12 @@ public class Config {
                         gifScale = Float.parseFloat(line.split("=")[1]);
                         Main.setGifScale(gifScale);
                     } catch (Exception ignored) {}
+                } else if (line.startsWith("selectedGifStyle=")) {
+                    try {
+                        selectedGifStyle = Integer.parseInt(line.split("=")[1]);
+                    } catch (Exception ignored) {}
+                } else if (line.startsWith("toggleBeams=")) {
+                    ParkourSettings.toggleBeams = Boolean.parseBoolean(line.split("=")[1]);
                 }
             }
             reader.close();

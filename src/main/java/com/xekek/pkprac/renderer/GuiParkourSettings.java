@@ -18,6 +18,7 @@
 package com.xekek.pkprac.renderer;
 
 import com.xekek.pkprac.Main;
+import com.xekek.pkprac.modules.Config;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.renderer.GlStateManager;
@@ -35,10 +36,21 @@ public class GuiParkourSettings extends GuiScreen {
     private GuiButton gifScaleUpButton;
     private GuiButton gifScaleText;
     private GuiButton toggleBeamsButton;
+    private GuiButton gifStyleButton;
     private GuiButton doneButton;
-    private float gifScale = 1.0f;
+    private float gifScale = Config.getGifScale();
 
-    private static final ResourceLocation LOGO_TEXTURE = new ResourceLocation("parkourmod", "practhumby.png");
+    private static final ResourceLocation LOGO_TEXTURE = new ResourceLocation("parkourmod", "thumbnail.png");
+
+    private static final String[] gifStyleNames = {"Miku", "Earth", "Nyan", "Spooky", "Winter"};
+    private static final String[] gifStylePaths = {
+            "parkourmod:Miku.gif",
+            "parkourmod:Earth.gif",
+            "parkourmod:Nyan.gif",
+            "parkourmod:Spooky.gif",
+            "parkourmod:Winter.gif"
+    };
+    private static int selectedGifStyle = 0;
 
     public GuiParkourSettings(GuiScreen parent) {
         this.parentScreen = parent;
@@ -47,16 +59,16 @@ public class GuiParkourSettings extends GuiScreen {
     @Override
     public void initGui() {
         int centerX = this.width / 2;
-        int centerY = this.height / 2;
+        int centerY = this.height / 2 + 20;
         this.buttonList.clear();
-        openCheckpointEditorButton = new GuiButton(0, centerX - 100, centerY - 44, 200, 20, "Open Checkpoint Editor");
-        toggleBeamsButton = new GuiButton(6, centerX - 100, centerY - 22, 200, 20, getToggleBeamsText());
-        toggleCheckpointButton = new GuiButton(1, centerX - 100, centerY, 200, 20, getCheckpointButtonText());
-        gifScaleText = new GuiButton(5, centerX - 56, centerY + 28, 116, 20, getGifScaleText());
-        gifScale = Main.getGifScale();
-        gifScaleDownButton = new GuiButton(3, centerX - 100, centerY + 28, 40, 20, "-");
-        gifScaleUpButton = new GuiButton(4, centerX + 60, centerY + 28, 40, 20, "+");
-        doneButton = new GuiButton(2, centerX - 100, centerY + 54, 200, 20, "Done");
+        openCheckpointEditorButton = new GuiButton(0, centerX - 100, centerY - 66, 200, 20, "Open Checkpoint Editor");
+        toggleBeamsButton = new GuiButton(6, centerX - 100, centerY - 44, 200, 20, getToggleBeamsText());
+        toggleCheckpointButton = new GuiButton(1, centerX - 100, centerY - 22, 200, 20, getCheckpointButtonText());
+        gifScaleDownButton = new GuiButton(3, centerX - 100, centerY, 40, 20, "-");
+        gifScaleText = new GuiButton(5, centerX - 56, centerY, 116, 20, getGifScaleText());
+        gifScaleUpButton = new GuiButton(4, centerX + 60, centerY, 40, 20, "+");
+        gifStyleButton = new GuiButton(7, centerX - 100, centerY + 22, 200, 20, getGifStyleText());
+        doneButton = new GuiButton(2, centerX - 100, centerY + 44, 200, 20, "Done");
 
         this.buttonList.add(openCheckpointEditorButton);
         this.buttonList.add(toggleBeamsButton);
@@ -64,6 +76,7 @@ public class GuiParkourSettings extends GuiScreen {
         this.buttonList.add(gifScaleDownButton);
         this.buttonList.add(gifScaleText);
         this.buttonList.add(gifScaleUpButton);
+        this.buttonList.add(gifStyleButton);
         this.buttonList.add(doneButton);
     }
 
@@ -75,6 +88,16 @@ public class GuiParkourSettings extends GuiScreen {
     private String getCheckpointButtonText() {
         boolean enabled = ParkourSettings.saveCheckpointOnActivation;
         return "Auto Checkpoint: " + (enabled ? "ON" : "OFF");
+    }
+    private String getGifStyleText() {
+        int idx = Config.getSelectedGifStyle();
+        String style = gifStyleNames[idx];
+        return "GIF Style: " + style;
+    }
+
+    public static String getSelectedGifPath() {
+        int idx = Config.getSelectedGifStyle();
+        return gifStylePaths[idx];
     }
 
     private String getGifScaleText() {
@@ -94,15 +117,23 @@ public class GuiParkourSettings extends GuiScreen {
             this.mc.displayGuiScreen(parentScreen);
         } else if (button.id == 3) {
             gifScale = Math.max(0.1f, gifScale - 0.1f);
+            Config.setGifScale(gifScale);
             Main.setGifScale(gifScale);
             this.initGui();
         } else if (button.id == 4) {
             gifScale = Math.min(1.5f, gifScale + 0.1f);
+            Config.setGifScale(gifScale);
             Main.setGifScale(gifScale);
             this.initGui();
         } else if (button.id == 6) {
             ParkourSettings.toggleBeams = !ParkourSettings.toggleBeams;
             toggleBeamsButton.displayString = getToggleBeamsText();
+        } else if (button.id == 7) {
+            int idx = (Config.getSelectedGifStyle() + 1) % gifStyleNames.length;
+            Config.setSelectedGifStyle(idx);
+            gifStyleButton.displayString = getGifStyleText();
+            Config.saveSettings();
+            Main.reloadGifRenderer();
         }
     }
 

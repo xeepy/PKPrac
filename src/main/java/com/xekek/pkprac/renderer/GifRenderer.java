@@ -59,28 +59,56 @@ public class GifRenderer extends Gui
     {
         try
         {
-            InputStream gifStream = getClass().getClassLoader().getResourceAsStream(gifPath);
+            ResourceLocation rl = new ResourceLocation(gifPath);
+            InputStream gifStream = Minecraft.getMinecraft().getResourceManager().getResource(rl).getInputStream();
             if (gifStream == null)
             {
                 System.out.println("GIF resource not found: " + gifPath);
                 return;
             }
-
+            int available = gifStream.available();
+            if (available == 0) {
+                System.out.println("GIF resource is empty: " + gifPath);
+                gifStream.close();
+                return;
+            } else {
+                System.out.println("Loaded GIF resource " + gifPath + " with size: " + available + " bytes");
+            }
             ImageInputStream stream = ImageIO.createImageInputStream(gifStream);
-            ImageReader reader = ImageIO.getImageReadersByFormatName("gif").next();
+            ImageReader reader = null;
+            try {
+                reader = ImageIO.getImageReadersByFormatName("gif").next();
+            } catch (Exception e) {
+                System.out.println("No GIF reader found for: " + gifPath);
+                stream.close();
+                gifStream.close();
+                return;
+            }
             reader.setInput(stream);
-
-            int frameCount = reader.getNumImages(true);
+            int frameCount = 0;
+            try {
+                frameCount = reader.getNumImages(true);
+            } catch (Exception e) {
+                System.out.println("Error reading GIF frame count: " + gifPath);
+                reader.dispose();
+                stream.close();
+                gifStream.close();
+                return;
+            }
             for (int i = 0; i < frameCount; i++)
             {
-                BufferedImage frame = reader.read(i);
-
+                BufferedImage frame = null;
+                try {
+                    frame = reader.read(i);
+                } catch (Exception e) {
+                    System.out.println("Error reading GIF frame " + i + " of " + gifPath + ": " + e.getMessage());
+                    continue;
+                }
                 originalFrames.add(frame);
                 if (i == 0) {
                     originalWidth = frame.getWidth();
                     originalHeight = frame.getHeight();
                 }
-
                 int delay = 100;
                 try
                 {
@@ -92,12 +120,11 @@ public class GifRenderer extends Gui
                 {
                 }
                 delays.add(delay);
-            }            reader.dispose();
+            }
+            reader.dispose();
             stream.close();
             gifStream.close();
-
             generateScaledTextures();
-
             isLoaded = true;
         }
         catch (IOException e)
@@ -200,3 +227,4 @@ public class GifRenderer extends Gui
         GlStateManager.disableBlend();
     }
 }
+
