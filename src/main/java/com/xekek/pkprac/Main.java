@@ -95,6 +95,7 @@ public class Main
     {
         Config.loadSettings();
         reloadGifRenderer();
+        MinecraftForge.EVENT_BUS.register(new Beams());
         MinecraftForge.EVENT_BUS.register(new Packets());
         MinecraftForge.EVENT_BUS.register(new PracticeMode());
         MinecraftForge.EVENT_BUS.register(new EventHandler());

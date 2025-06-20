@@ -29,71 +29,47 @@ import static com.xekek.pkprac.modules.PracticeMode.*;
 
 public class Beams {
 
-    public Beams() {
-        MinecraftForge.EVENT_BUS.register(this);
-    }
-
     @SubscribeEvent
     public void onRenderWorldLast(RenderWorldLastEvent event) {
         if (!PracticeMode.isPracticeModeEnabled()) return;
         if (!!ParkourSettings.toggleBeams) return;
-        renderAnchorBeam(savedX, savedY, savedZ, event);
+        renderBeam(savedX, savedY, savedZ, 0.2f, 0.8f, 1.0f, 0.7f, event);
 
         if (CPManager.hasCheckpoints() && CPManager.checkpoints.get(CPManager.currentIndex) != null) {
             CPManager.Checkpoint cp = CPManager.checkpoints.get(CPManager.currentIndex);
-            renderCheckpointBeam(cp.x, cp.y, cp.z, event);
+            renderBeam(cp.x, cp.y, cp.z, 0.6f, 1.0f, 0.6f, 0.7f, event);
         }
     }
 
-
-    public static void renderAnchorBeam(double x, double y, double z, RenderWorldLastEvent event) {
-        Minecraft mc = Minecraft.getMinecraft();
-        double rx = x - mc.getRenderManager().viewerPosX;
-        double ry = y - mc.getRenderManager().viewerPosY;
-        double rz = z - mc.getRenderManager().viewerPosZ;
-
+    private static void setupBeamRendering(float r, float g, float b, float alpha) {
         GL11.glPushMatrix();
         GL11.glDisable(GL11.GL_TEXTURE_2D);
         GL11.glEnable(GL11.GL_BLEND);
         GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-        GL11.glColor4f(0.2f, 0.8f, 1.0f, 0.7f);
-
+        GL11.glColor4f(r, g, b, alpha);
         GL11.glEnable(GL11.GL_DEPTH_TEST);
         GL11.glDepthFunc(GL11.GL_LEQUAL);
         GL11.glDepthMask(true);
         GL11.glLineWidth(6.0f);
-        GL11.glBegin(GL11.GL_LINES);
-        GL11.glVertex3d(rx, ry, rz);
-        GL11.glVertex3d(rx, ry + 10, rz);
-        GL11.glEnd();
+    }
 
+    private static void cleanupBeamRendering() {
         GL11.glDisable(GL11.GL_BLEND);
         GL11.glEnable(GL11.GL_TEXTURE_2D);
         GL11.glPopMatrix();
     }
-    public static void renderCheckpointBeam(double x, double y, double z, RenderWorldLastEvent event) {
+
+    public static void renderBeam(double x, double y, double z, float r, float g, float b, float alpha, RenderWorldLastEvent event) {
         Minecraft mc = Minecraft.getMinecraft();
         double rx = x - mc.getRenderManager().viewerPosX;
         double ry = y - mc.getRenderManager().viewerPosY;
         double rz = z - mc.getRenderManager().viewerPosZ;
 
-        GL11.glPushMatrix();
-        GL11.glDisable(GL11.GL_TEXTURE_2D);
-        GL11.glEnable(GL11.GL_BLEND);
-        GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-        GL11.glColor4f(0.6f, 1.0f, 0.6f, 0.7f);
-
-        GL11.glEnable(GL11.GL_DEPTH_TEST);
-        GL11.glDepthFunc(GL11.GL_LEQUAL);
-        GL11.glDepthMask(true);
-        GL11.glLineWidth(6.0f);
+        setupBeamRendering(r, g, b, alpha);
         GL11.glBegin(GL11.GL_LINES);
         GL11.glVertex3d(rx, ry, rz);
         GL11.glVertex3d(rx, ry + 10, rz);
         GL11.glEnd();
-
-        GL11.glDisable(GL11.GL_BLEND);
-        GL11.glEnable(GL11.GL_TEXTURE_2D);
-        GL11.glPopMatrix();
+        cleanupBeamRendering();
     }
 }
