@@ -16,9 +16,11 @@ There is configurable options for hotkeys, showing where your checkpoints and an
 This mod desyncs your movement client-side and is built with anticheat compatibility in mind. It should be safe on most servers, but there's no guarantee every anticheat will agree.
 If you do get flagged, try reproducing it on an anticheat test server like `test.ccbluex.net` and report it (see [Reporting an Issue](https://github.com/xeepy/PKPrac/blob/main/CONTRIBUTING.md#reporting-issues)) to help improve the mod.
 
-## For Server Owners
+## For Server Administrators
 
-We have a companion plugin that will be released shortly, allowing admins to place invisible armor stands. This feature is designed to enhance server customization and gameplay experience.
+Checkout the [companion plugin](https://github.com/xeepy/PKPrac-Companion)!
+
+We have a companion plugin that allows admins to disable and enable practice mode, it uses invisible armor stands above the player from the server. This feature is designed to enhance server customization and gameplay experience.
 
 Note: In a future update, we will transfer this plugin to a channel-based messaging system for improved communication and flexibility.
 
