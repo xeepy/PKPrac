@@ -134,6 +134,8 @@ public class ChatCommands {
             double y = Double.parseDouble(parts[2]);
             double z = Double.parseDouble(parts[3]);
 
+            CPManager.isCheckpointTeleporting = true;
+
             player.setPositionAndRotation(x, y, z, player.rotationYaw, player.rotationPitch);
             player.motionX = 0;
             player.motionY = 0;
@@ -141,6 +143,15 @@ public class ChatCommands {
             player.fallDistance = 0;
 
             player.addChatMessage(new ChatComponentText("Teleported to (" + x + ", " + y + ", " + z + ")"));
+
+            new Thread(() -> {
+                try {
+                    Thread.sleep(100);
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                }
+                CPManager.isCheckpointTeleporting = false;
+            }).start();
         }
         catch (NumberFormatException e)
         {

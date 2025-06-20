@@ -1,6 +1,6 @@
 # Contributing to PKPrac
 
-Thank you for your interest in contributing to PKPrac! This document provides guidelines for contributing to the project.
+Thanks for wanting to contribute to PKPrac! Here's everything you need to know to get started.
 
 ## Getting Started
 
@@ -15,13 +15,13 @@ Thank you for your interest in contributing to PKPrac! This document provides gu
 ## Development Guidelines
 
 ### Code Style
-- Follow Java naming conventions
-- Use meaningful variable and method names
-- Add comments for complex logic
-- Maintain the existing code structure and patterns
+- Follow standard Java naming conventions
+- Use descriptive variable and method names
+- Comment complex logic so others can understand it
+- Keep the existing code structure and patterns
 
 ### License Headers
-All new files must include the GPL v3 license header:
+All new files need the GPL v3 license header:
 ```java
 /*
  * PKPrac - A parkour practice mod
@@ -43,41 +43,44 @@ All new files must include the GPL v3 license header:
 ```
 
 ### Testing
-- Test your changes thoroughly in-game
-- Ensure compatibility with Minecraft 1.8.9 and Forge 11.15.1.2318
-- Test both single-player and multiplayer environments
+- Test your changes in-game before submitting
+- Make sure it works with Minecraft 1.8.9 and Forge 11.15.1.2318
+- Test in both singleplayer and multiplayer environments
 
 ## Submitting Changes
 
-1. Create a new branch for your feature: `git checkout -b feature-name`
-2. Make your changes and commit them with descriptive messages
+1. Create a branch for your feature: `git checkout -b feature-name`
+2. Make your changes with clear commit messages
 3. Push to your fork: `git push origin feature-name`
-4. Create a Pull Request with:
-   - Clear description of changes
+4. Open a Pull Request with:
+   - Clear description of what you changed
    - Why the changes are needed
-   - Any testing performed
+   - What testing you did
 
 ## Reporting Issues
 
-When reporting bugs, please include:
+When reporting bugs, include:
 - Minecraft version
 - Forge version
 - PKPrac version
-- Steps to reproduce
-- Expected vs actual behavior
-- Crash logs (if applicable)
+- Steps to reproduce the issue
+- What you expected vs what actually happened
+- Crash logs if applicable
+
+[open an issue](../../issues)
 
 ## Feature Requests
 
 For new features:
-- Check if the feature already exists or has been requested
-- Explain the use case and benefits
-- Consider implementation complexity
+- Check if it's already been requested
+- Explain what you want and why it would be useful
+- Keep in mind the scope of the mod
 
 ## Code of Conduct
 
-- Be respectful and constructive
-- Focus on the technical aspects
-- Help others learn and grow
+- Be respectful in discussions
+- Stay constructive with feedback
+- Focus on improving the mod
+- Help others when you can
 
-Thank you for contributing!
+Thanks for contributing!

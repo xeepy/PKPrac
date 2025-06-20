@@ -17,14 +17,13 @@
  */
 package com.xekek.pkprac.modules;
 
-import com.xekek.pkprac.Main;
 import com.xekek.pkprac.client.KeyHandler;
 import com.xekek.pkprac.events.Packets;
 import com.xekek.pkprac.renderer.Notifications;
 import com.xekek.pkprac.renderer.ParkourSettings;
+import com.xekek.pkprac.server.MarkerHandler;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
-import net.minecraft.network.play.client.C03PacketPlayer;
 
 import static com.xekek.pkprac.client.KeyHandler.getKeyName;
 
@@ -40,24 +39,35 @@ public class PracticeMode {
     public static boolean isFinishedResyncing = true;
     public static boolean justTeleported = false;
 
-    public static net.minecraft.item.ItemStack hotbarItem = null;
+    private static int savedHotbarSlot;
+    private static long lastToggleTime = 0;
 
 
 
     public static void togglePracticeMode() {
+        long currentTime = System.currentTimeMillis();
+        if (currentTime - lastToggleTime < 2000) {
+            Notifications.add("You must wait 2 seconds before toggling practice mode again!", Notifications.NotificationType.WARNING);
+            return;
+        }
+        lastToggleTime = currentTime;
+
         double totalMotion = Math.abs(mc.thePlayer.motionX) + Math.abs(mc.thePlayer.motionZ);
 
-        if(!mc.thePlayer.onGround){
+        if (!mc.thePlayer.onGround) {
             Notifications.add("You must be on the ground to toggle practice mode!", Notifications.NotificationType.WARNING);
             return;
         }
-        if(mc.thePlayer.isSneaking()){
+        if (mc.thePlayer.isSneaking()) {
             Notifications.add("You must not be sneaking to toggle practice mode!", Notifications.NotificationType.WARNING);
+            return;
+        }
+        if (MarkerHandler.isNoPracticeMarkerNearby(mc.thePlayer.getPosition())) {
+            Notifications.add("You cannot toggle practice mode near a no-practice marker!", Notifications.NotificationType.WARNING);
             return;
         }
 
         if (totalMotion > 0.01) {
-            String practiceKeyName = getKeyName(KeyHandler.toggleKey);
             Notifications.add("You have to be standing still to toggle practice mode.", Notifications.NotificationType.WARNING);
             return;
         }
@@ -69,7 +79,7 @@ public class PracticeMode {
             setPracticeMode();
         } else {
             isFinishedResyncing = false;
-            if(mc.thePlayer.capabilities.isCreativeMode){
+            if (mc.thePlayer.capabilities.isCreativeMode) {
                 mc.thePlayer.capabilities.allowFlying = true;
             }
             Notifications.add("Practice mode Disabled!", Notifications.NotificationType.DISABLED);
@@ -79,14 +89,14 @@ public class PracticeMode {
         if (isEnabled) {
             EntityPlayerSP player = mc.thePlayer;
             if (player != null) {
-                hotbarItem = player.getHeldItem();
+                savedHotbarSlot = player.inventory.currentItem;
                 preciseX = savedX = player.posX;
                 preciseY = savedY = player.posY;
                 preciseZ = savedZ = player.posZ;
                 preciseYaw = savedYaw = player.rotationYaw;
                 precisePitch = savedPitch = player.rotationPitch;
             }
-            if(ParkourSettings.saveCheckpointOnActivation) {
+            if (ParkourSettings.saveCheckpointOnActivation) {
                 CPManager.saveCheckpoint(player);
             }
             isFinishedResyncing = false;
@@ -95,17 +105,23 @@ public class PracticeMode {
         } else {
             EntityPlayerSP player = mc.thePlayer;
             if (player != null) {
+                justTeleported = true;
+                player.inventory.currentItem = savedHotbarSlot;
                 player.setPosition(preciseX, preciseY, preciseZ);
                 player.rotationPitch = precisePitch;
                 player.rotationYaw = preciseYaw;
                 player.prevRotationPitch = precisePitch;
                 player.prevRotationYaw = preciseYaw;
-                justTeleported = true;
+
+                new Thread(() -> {
+                    try {
+                        Thread.sleep(150);
+                    } catch (InterruptedException e) {
+                        Thread.currentThread().interrupt();
+                    }
+                    justTeleported = false;
+                }).start();
             }
-            savedX = savedY = savedZ = 0;
-            savedYaw = savedPitch = 0f;
-            preciseX = preciseY = preciseZ = 0;
-            preciseYaw = precisePitch = 0f;
         }
     }
     public static void shutdown() {
@@ -117,5 +133,23 @@ public class PracticeMode {
 
     public static boolean isPracticeModeEnabled() {
         return isEnabled;
+    }
+
+    public static void handleServerTeleport(double x, double y, double z) {
+        if (isPracticeModeEnabled()) {
+            savedX = preciseX = x;
+            savedY = preciseY = y;
+            savedZ = preciseZ = z;
+
+            isEnabled = false;
+            if (Flight.isFlying){
+                Flight.Fly();
+            }
+
+            savedYaw = savedPitch = 0f;
+            preciseYaw = precisePitch = 0f;
+
+            isFinishedResyncing = true;
+        }
     }
 }

@@ -26,6 +26,8 @@ import java.util.List;
 public class CPManager {
     public static int MaxCheckpoints = 10;
 
+    public static boolean isCheckpointTeleporting = false;
+
     public static class Checkpoint {
         public double x, y, z;
         public double motionX, motionY, motionZ;
@@ -69,12 +71,24 @@ public class CPManager {
         if (index >= 0 && index < checkpoints.size()) {
             Checkpoint cp = checkpoints.get(index);
             Notifications.add("Loading checkpoint " + (index + 1), Notifications.NotificationType.INFO);
+
+            isCheckpointTeleporting = true;
+
             player.setPositionAndRotation(cp.x, cp.y, cp.z, cp.yaw, cp.pitch);
             player.motionX = cp.motionX;
             player.motionY = cp.motionY;
             player.motionZ = cp.motionZ;
             player.fallDistance = 0;
             currentIndex = index;
+
+            new Thread(() -> {
+                try {
+                    Thread.sleep(100);
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                }
+                isCheckpointTeleporting = false;
+            }).start();
         }
     }
 

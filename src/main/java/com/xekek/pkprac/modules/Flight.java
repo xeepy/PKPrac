@@ -22,7 +22,7 @@ import net.minecraft.client.Minecraft;
 
 public class Flight {
 
-    private static boolean isFlying = false;
+    public static boolean isFlying = false;
 
     static Minecraft mc = Minecraft.getMinecraft();
 
