@@ -27,10 +27,12 @@ jobs:
           distribution: 'temurin'
       - run: chmod +x ./gradlew
       - run: ./gradlew build
-      - uses: actions/upload-artifact@v4
+
+      - name: Upload built mod jar
+        uses: actions/upload-artifact@v4
         with:
           name: pkprac-mod
-          path: build/libs/*.jar
+          path: build/libs/PKPracMod.jar
 
   release:
     if: github.event_name == 'release' || startsWith(github.ref, 'refs/tags/v')
@@ -44,8 +46,3 @@ jobs:
           distribution: 'temurin'
       - run: chmod +x ./gradlew
       - run: ./gradlew build
-      - uses: softprops/action-gh-release@v2
-        with:
-          files: build/libs/*.jar
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
