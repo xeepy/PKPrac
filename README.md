@@ -28,16 +28,9 @@ Note: In a future update, we will transfer this plugin to a channel-based messag
 
 - **Practice Mode**: Press `default G` to desync your client movement and practice wherever you want, if auto checkpoint is on you can press `default R` to teleport back to the anchor point. You can also fly `default F` to jumps later on and set custom checkpoints `default Z`
 - **Checkpoint Management**: Save as many checkpoints as you like `.setmaxcp [num]` and switch between them fast `default F9 and F10`. You can also save all of your checkpoints and load them back from .txt files in the PKPrac folder. For example, you can share 100 checkpoints from a long rankup course with a friend. Checkpoints can be placed midair and preserve your exact velocity tick perfectly, meaning you can simulate mid-air turns 1:1. (See the [Demos section](https://github.com/xeepy/PKPrac?tab=readme-ov-file#demos) for a visual example.)
-
-
-<!--
-Unlike enabling and disabling practice mode, checkpoints can be set midair and will save velocity tick perfectly. This means you can simulate mid air turns 1:1. -->
-
-
-
 - **Visual Feedback**: On-screen notifications and visual indicators
 - **Desync Commands**: Use `.teleport` and `.angle` commands for precise positioning in desync mode
-- 
+
 ## Installation
 
 1. Download the latest release from the [Releases](../../releases) page
