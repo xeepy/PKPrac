@@ -65,7 +65,7 @@ public class PracticeMode {
             return;
         }
 
-        if (totalMotion > 0.01) {
+        if (totalMotion > 0.00) {
             Notifications.add("You have to be standing still to toggle practice mode.", Notifications.NotificationType.WARNING);
             return;
         }
