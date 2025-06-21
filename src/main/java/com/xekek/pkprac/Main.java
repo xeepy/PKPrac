@@ -17,6 +17,7 @@
  */
 package com.xekek.pkprac;
 
+import com.xekek.pkprac.client.BlockDetection;
 import com.xekek.pkprac.client.KeyHandler;
 import com.xekek.pkprac.events.EventHandler;
 import com.xekek.pkprac.client.Config;
@@ -48,16 +49,7 @@ import net.minecraftforge.fml.common.network.FMLNetworkEvent;
 public class Main
 {
     public static final String MODID = "PKPrac";
-    public static final String VERSION = "1.0.1";
-
-    private static int lastHurtTime = 0;
-    public static boolean needsResync = false;
-
-    private static String lastWorldName = "";
-    private static boolean firstTick = true;
-
-    private static String[] lastBlockStates = new String[0];
-    private static boolean blockStatesInitialized = false;
+    public static final String VERSION = "1.0.2";
 
     private static GifRenderer gifRenderer;
     private static Notifications notificationSystem;
@@ -105,6 +97,7 @@ public class Main
         MinecraftForge.EVENT_BUS.register(new Packets());
         MinecraftForge.EVENT_BUS.register(new PracticeMode());
         MinecraftForge.EVENT_BUS.register(new EventHandler());
+        MinecraftForge.EVENT_BUS.register(new BlockDetection());
         beams = new Beams();
 
         new KeyHandler();
@@ -122,133 +115,4 @@ public class Main
             gifRenderer = null;
         }
     }
-
-    @SubscribeEvent
-    public void onClientTick(TickEvent.ClientTickEvent event) {
-        if (event.phase == TickEvent.Phase.END && Minecraft.getMinecraft().thePlayer != null) {
-            EntityPlayerSP player = Minecraft.getMinecraft().thePlayer;
-
-            String currentWorldName = "";
-            if (Minecraft.getMinecraft().theWorld != null) {
-                currentWorldName = Minecraft.getMinecraft().theWorld.getWorldInfo().getWorldName();
-            }
-
-            if (PracticeMode.isPracticeModeEnabled()) {
-                boolean worldChanged = !firstTick && !currentWorldName.equals(lastWorldName);
-
-                double minX = PracticeMode.savedX - 0.3;
-                double maxX = PracticeMode.savedX + 0.3;
-                double minZ = PracticeMode.savedZ - 0.3;
-                double maxZ = PracticeMode.savedZ + 0.3;
-                double y = Math.floor(PracticeMode.savedY - 0.03);
-
-                BlockPos[] positions = new BlockPos[] {
-                        new BlockPos(minX, y, minZ),
-                        new BlockPos(maxX, y, minZ),
-                        new BlockPos(minX, y, maxZ),
-                        new BlockPos(maxX, y, maxZ)
-                };
-
-                boolean standingOnSomething = false;
-                for (BlockPos pos : positions) {
-                    for (int i = 0; i >= -1; i--) {
-                        BlockPos checkPos = pos.add(0, i, 0);
-                        IBlockState state = Minecraft.getMinecraft().theWorld.getBlockState(checkPos);
-                        Block block = state.getBlock();
-
-                        AxisAlignedBB collisionBox = block.getCollisionBoundingBox(Minecraft.getMinecraft().theWorld, checkPos, state);
-                        if (collisionBox != null) {
-                            standingOnSomething = true;
-                            break;
-                        }
-                    }
-                    if (standingOnSomething) {
-                        break;
-                    }
-                }
-
-                boolean blockBroken = !standingOnSomething;
-
-                boolean wasHit = player.hurtTime > 0 && player.hurtTime != lastHurtTime;
-                boolean isDead = player.isDead || player.getHealth() <= 0;
-
-                boolean blockStateChanged = false;
-                String[] currentBlockStates = captureBlockStates(PracticeMode.savedX, PracticeMode.savedY, PracticeMode.savedZ);
-
-                if (blockStatesInitialized && currentBlockStates.length == lastBlockStates.length) {
-                    for (int i = 0; i < currentBlockStates.length; i++) {
-                        if (!currentBlockStates[i].equals(lastBlockStates[i])) {
-                            blockStateChanged = true;
-                            break;
-                        }
-                    }
-                } else if (!blockStatesInitialized) {
-                    blockStatesInitialized = true;
-                }
-                lastBlockStates = currentBlockStates;
-
-                if (!needsResync && (blockBroken || wasHit || isDead || worldChanged || blockStateChanged)) {
-                    PracticeMode.isEnabled = false;
-                    PracticeMode.setPracticeMode();
-
-                    String reason = "Something's gone wrong! Resyncing.";
-                    if (worldChanged) reason = "World change detected! Resyncing.";
-                    if (blockStateChanged) reason = "Block state changed! Resyncing.";
-
-                    Notifications.add(reason, Notifications.NotificationType.WARNING);
-                    needsResync = true;
-                }
-                lastHurtTime = player.hurtTime;
-            } else {
-                needsResync = false;
-                blockStatesInitialized = false;
-            }
-
-            lastWorldName = currentWorldName;
-            firstTick = false;
-
-            if (PracticeMode.justTeleported) {
-                PracticeMode.justTeleported = false;
-            }
-        }
-    }
-    public static Notifications getNotificationSystem() {
-        return notificationSystem;
-    }
-
-    private static String[] captureBlockStates(double centerX, double centerY, double centerZ) {
-        if (Minecraft.getMinecraft().theWorld == null) {
-            return new String[0];
-        }
-
-        java.util.List<String> states = new java.util.ArrayList<>();
-
-        for (int x = -1; x <= 1; x++) {
-            for (int y = -1; y <= 1; y++) {
-                for (int z = -1; z <= 1; z++) {
-                    BlockPos pos = new BlockPos(centerX + x, centerY + y, centerZ + z);
-
-                    try {
-                        IBlockState blockState = Minecraft.getMinecraft().theWorld.getBlockState(pos);
-                        Block block = blockState.getBlock();
-                        String blockName = block.getUnlocalizedName();
-
-                        if (blockName.contains("trapdoor") || blockName.contains("door") ||
-                            blockName.contains("button") || blockName.contains("lever") ||
-                            blockName.contains("pressure") || blockName.contains("tripwire") ||
-                            blockName.contains("redstone") || blockName.contains("piston") ||
-                            blockName.contains("fence_gate") || blockName.contains("torch")) {
-
-                            String stateString = pos.toString() + ":" + blockState.toString();
-                            states.add(stateString);
-                        }
-                    } catch (Exception e) {
-                    }
-                }
-            }
-        }
-
-        return states.toArray(new String[0]);
-    }
-
 }
