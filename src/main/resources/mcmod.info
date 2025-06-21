@@ -1,6 +1,6 @@
 [
 {
-  "modid": "PKPrac",
+  "modid": "pkprac",
   "name": "PKPrac",
   "description": "A Full Parkour Practice Suite for Minecraft 1.8! (.teleport and .angle for coordinates and setting angles in desync mode!)",
   "version": "${version}",

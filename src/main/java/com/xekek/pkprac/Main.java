@@ -19,7 +19,6 @@ package com.xekek.pkprac;
 
 import com.xekek.pkprac.client.ResyncDetection;
 import com.xekek.pkprac.client.KeyHandler;
-import com.xekek.pkprac.events.EventHandler;
 import com.xekek.pkprac.client.Config;
 import com.xekek.pkprac.modules.PracticeMode;
 import com.xekek.pkprac.network.Packets;
@@ -36,10 +35,10 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.network.FMLNetworkEvent;
 
 
-@Mod(modid = Main.MODID, version = Main.VERSION, name = "PKPrac")
+@Mod(modid = Main.MODID, version = Main.VERSION, name = "pkprac")
 public class Main
 {
-    public static final String MODID = "PKPrac";
+    public static final String MODID = "pkprac";
     public static final String VERSION = "1.0.3-dev";
 
     private static GifRenderer gifRenderer;
@@ -87,10 +86,8 @@ public class Main
         MinecraftForge.EVENT_BUS.register(new Beams());
         MinecraftForge.EVENT_BUS.register(new Packets());
         MinecraftForge.EVENT_BUS.register(new PracticeMode());
-        MinecraftForge.EVENT_BUS.register(new EventHandler());
         MinecraftForge.EVENT_BUS.register(new ResyncDetection());
         beams = new Beams();
-
         new KeyHandler();
     }
 

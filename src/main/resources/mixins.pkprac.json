@@ -1,0 +1,13 @@
+{
+  "required": true,
+  "package": "com.xekek.pkprac.mixins",
+  "compatibilityLevel": "JAVA_8",
+  "mixins": [
+    "PlayerControllerMPMixin"
+  ],
+  "client": [],
+  "server": [],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}
