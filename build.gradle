@@ -32,7 +32,7 @@ minecraft {
 
     // Stable mappings for reliable builds
     mappings = "stable_22"
-    // makeObfSourceJar = false // an Srg named sources jar is made by default. uncomment this to disable.
+    makeObfSourceJar = false // an Srg named sources jar is made by default. uncomment this to disable.
 }
 
 dependencies {
