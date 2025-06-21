@@ -53,36 +53,6 @@ public class EventHandler {    private static final Minecraft mc = Minecraft.get
             showCooldownNotification("Cannot interact with blocks in practice mode", Notifications.NotificationType.WARNING);
         }
     }
-    @SubscribeEvent(priority = EventPriority.HIGHEST)
-    public void onMouseEvent(MouseEvent event) {
-        if (!PracticeMode.isPracticeModeEnabled()) return;
-
-        Minecraft mc = Minecraft.getMinecraft();
-        if (mc.thePlayer == null || mc.theWorld == null) return;
-        if (event.button == 0) {
-            leftClickHeld = event.buttonstate;
-
-            if (event.buttonstate && mc.objectMouseOver != null &&
-                mc.objectMouseOver.typeOfHit == MovingObjectPosition.MovingObjectType.BLOCK) {
-                event.setCanceled(true);
-                leftClickHeld = false;
-                showCooldownNotification("Cannot break blocks in practice mode", Notifications.NotificationType.WARNING);
-                return;
-            }
-        }
-
-        if ((event.button == 0 || event.button == 1) && event.buttonstate) {
-            if (mc.objectMouseOver != null && mc.objectMouseOver.typeOfHit == MovingObjectPosition.MovingObjectType.BLOCK) {
-                event.setCanceled(true);
-
-                String message = event.button == 0 ?
-                    "Cannot break blocks in practice mode" :
-                    "Cannot place/interact with blocks in practice mode";
-
-                showCooldownNotification(message, Notifications.NotificationType.WARNING);
-            }
-        }
-    }
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     public void onClientTick(TickEvent.ClientTickEvent event) {
