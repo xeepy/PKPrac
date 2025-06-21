@@ -28,11 +28,13 @@ import com.xekek.pkprac.renderer.gui.GifRenderer;
 import com.xekek.pkprac.renderer.gui.GuiParkourSettings;
 
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockStairs;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.BlockPos;
+import net.minecraft.util.EnumFacing;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
@@ -235,6 +237,12 @@ public class Main
                         Block block = blockState.getBlock();
                         String blockName = block.getUnlocalizedName();
 
+                        if (block instanceof BlockStairs) {
+                            IBlockState state = Minecraft.getMinecraft().theWorld.getBlockState(pos);
+                            if (state.getValue(BlockStairs.HALF) == BlockStairs.EnumHalf.TOP) {
+                                // Ermm What the Reverse Stair
+                            }
+                        }
                         if (blockName.contains("trapdoor") || blockName.contains("door") ||
                             blockName.contains("button") || blockName.contains("lever") ||
                             blockName.contains("pressure") || blockName.contains("tripwire") ||
