@@ -33,22 +33,3 @@ jobs:
         with:
           name: pkprac-mod
           path: build/libs/PKPrac-*.jar
-
-  release:
-    if: github.event_name == 'release' || startsWith(github.ref, 'refs/tags/v')
-    runs-on: ubuntu-latest
-
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-java@v4
-        with:
-          java-version: '8'
-          distribution: 'temurin'
-      - run: chmod +x ./gradlew
-      - run: ./gradlew build
-
-      - name: Upload release jar
-        uses: actions/upload-artifact@v4
-        with:
-          name: pkprac-release
-          path: build/libs/PKPrac-*.jar
