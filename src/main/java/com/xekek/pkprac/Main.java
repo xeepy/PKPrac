@@ -93,6 +93,7 @@ public class Main
         MinecraftForge.EVENT_BUS.register(this);
         notificationSystem = new Notifications();
         MinecraftForge.EVENT_BUS.register(notificationSystem);
+        MinecraftForge.EVENT_BUS.register(new UpdateChecker());
     }
 
     @Mod.EventHandler
