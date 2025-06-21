@@ -158,7 +158,6 @@ public class Main
                         AxisAlignedBB collisionBox = block.getCollisionBoundingBox(Minecraft.getMinecraft().theWorld, checkPos, state);
                         if (collisionBox != null) {
                             standingOnSomething = true;
-                            System.out.println("Solid block (collision box) detected at " + checkPos + " (" + block.getUnlocalizedName() + ")");
                             break;
                         }
                     }
