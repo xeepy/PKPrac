@@ -8,11 +8,12 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.BlockPos;
-import net.minecraft.util.EnumFacing;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 
-public class BlockDetection {
+import static com.xekek.pkprac.modules.PracticeMode.savedBB;
+
+public class ResyncDetection {
 
     private static int lastHurtTime = 0;
     public static boolean needsResync = false;
@@ -36,42 +37,12 @@ public class BlockDetection {
 
             if (PracticeMode.isPracticeModeEnabled()) {
                 boolean worldChanged = !firstTick && !currentWorldName.equals(lastWorldName);
+                AxisAlignedBB feetBB = new AxisAlignedBB(
+                        savedBB.minX, savedBB.minY - 0.05, savedBB.minZ,
+                        savedBB.maxX, savedBB.minY, savedBB.maxZ
+                );
 
-                double minX = PracticeMode.savedX - 0.3;
-                double maxX = PracticeMode.savedX + 0.3;
-                double minZ = PracticeMode.savedZ - 0.3;
-                double maxZ = PracticeMode.savedZ + 0.3;
-                double y = Math.floor(PracticeMode.savedY - 0.03);
-
-                BlockPos[] positions = new BlockPos[] {
-                        new BlockPos(minX, y, minZ),
-                        new BlockPos(maxX, y, minZ),
-                        new BlockPos(minX, y, maxZ),
-                        new BlockPos(maxX, y, maxZ)
-                };
-
-                boolean standingOnSomething = false;
-                for (BlockPos pos : positions) {
-                    BlockPos checkPos = pos.add(0, 0, 0);
-                    IBlockState state = Minecraft.getMinecraft().theWorld.getBlockState(checkPos);
-                    Block block = state.getBlock();
-
-                    System.out.println("Checking block at " + checkPos + ": " + block.getUnlocalizedName());
-
-                    if(!block.isAir(Minecraft.getMinecraft().theWorld, checkPos) && state.getBlock().isBlockSolid(Minecraft.getMinecraft().theWorld, checkPos, EnumFacing.UP)) {
-                        standingOnSomething = true;
-                        break;
-                    }
-                    AxisAlignedBB collisionBox = block.getCollisionBoundingBox(Minecraft.getMinecraft().theWorld, checkPos, state);
-                    if (collisionBox != null) {
-                        standingOnSomething = true;
-                        break;
-                    }
-                    if (standingOnSomething) {
-                        break;
-                    }
-                }
-
+                boolean standingOnSomething = !Minecraft.getMinecraft().theWorld.getCollidingBoundingBoxes(player, feetBB).isEmpty();
                 boolean blockBroken = !standingOnSomething;
 
                 boolean wasHit = player.hurtTime > 0 && player.hurtTime != lastHurtTime;
@@ -147,6 +118,7 @@ public class BlockDetection {
                             states.add(stateString);
                         }
                     } catch (Exception e) {
+
                     }
                 }
             }

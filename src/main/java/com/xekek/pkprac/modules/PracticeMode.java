@@ -24,18 +24,20 @@ import com.xekek.pkprac.renderer.ParkourSettings;
 import com.xekek.pkprac.server.MarkerHandler;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
+import net.minecraft.util.AxisAlignedBB;
 
 import static com.xekek.pkprac.client.KeyHandler.getKeyName;
 
 public class PracticeMode {
 
     public static boolean isEnabled = false;
-    private static final Minecraft mc = Minecraft.getMinecraft();    public static double savedX, savedY, savedZ;
+    private static final Minecraft mc = Minecraft.getMinecraft();
+    public static double savedX, savedY, savedZ;
     private static float savedYaw, savedPitch;
+    public static AxisAlignedBB savedBB = null;
 
     private static double preciseX, preciseY, preciseZ;
     private static float preciseYaw, precisePitch;
-
     public static boolean isFinishedResyncing = true;
     public static boolean justTeleported = false;
 
@@ -94,6 +96,7 @@ public class PracticeMode {
                 preciseZ = savedZ = player.posZ;
                 preciseYaw = savedYaw = player.rotationYaw;
                 precisePitch = savedPitch = player.rotationPitch;
+                savedBB = player.getEntityBoundingBox();
             }
             if (ParkourSettings.saveCheckpointOnActivation) {
                 CPManager.saveCheckpoint(player);
@@ -111,7 +114,7 @@ public class PracticeMode {
                 player.rotationYaw = preciseYaw;
                 player.prevRotationPitch = precisePitch;
                 player.prevRotationYaw = preciseYaw;
-
+                savedBB = null;
                 new Thread(() -> {
                     try {
                         Thread.sleep(150);

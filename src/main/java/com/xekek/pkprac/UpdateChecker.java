@@ -45,15 +45,27 @@ public class UpdateChecker {
 
             String currentVersion = Main.VERSION;
 
-            if (!currentVersion.equals(latestVersion)) {
+            if (isVersionNewer(currentVersion, latestVersion)) {
                 Minecraft.getMinecraft().thePlayer.addChatMessage(new ChatComponentText(
                         EnumChatFormatting.YELLOW + "[PKPrac] " + EnumChatFormatting.RESET + "Update available: " +
                         EnumChatFormatting.GREEN + latestVersion + EnumChatFormatting.RESET + " (You have " +
-                        EnumChatFormatting.RED + currentVersion + EnumChatFormatting.RESET
+                        EnumChatFormatting.RED + currentVersion + EnumChatFormatting.RESET + ")"
                 ));
             }
         } catch (Exception e) {
             System.out.println("Failed to check for updates: " + e.getMessage());
         }
+    }
+
+    private boolean isVersionNewer(String current, String latest) {
+        String[] currParts = current.split("\\.");
+        String[] latestParts = latest.split("\\.");
+        for (int i = 0; i < Math.min(currParts.length, latestParts.length); i++) {
+            int currNum = Integer.parseInt(currParts[i].replaceAll("[^0-9]", ""));
+            int latestNum = Integer.parseInt(latestParts[i].replaceAll("[^0-9]", ""));
+            if (latestNum > currNum) return true;
+            if (latestNum < currNum) return false;
+        }
+        return latestParts.length > currParts.length;
     }
 }
