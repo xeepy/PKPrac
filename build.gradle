@@ -17,7 +17,7 @@ apply plugin: 'net.minecraftforge.gradle.forge'
 
 // PKPrac - Parkour Practice Mod for Minecraft 1.8.9
 // Built with ForgeGradle 2.1 for compatibility
-version = "1.0.0"
+version = "1.0.1"
 group= "com.xekek.pkprac" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = "PKPrac"
 sourceCompatibility = 1.8
