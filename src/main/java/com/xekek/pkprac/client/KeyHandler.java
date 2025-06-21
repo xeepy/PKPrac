@@ -21,8 +21,9 @@ import com.xekek.pkprac.Main;
 import com.xekek.pkprac.modules.CPManager;
 import com.xekek.pkprac.modules.Flight;
 import com.xekek.pkprac.modules.PracticeMode;
-import com.xekek.pkprac.renderer.GuiParkourSettings;
 import com.xekek.pkprac.renderer.Notifications;
+import com.xekek.pkprac.renderer.gui.GuiParkourSettings;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraftforge.fml.client.registry.ClientRegistry;

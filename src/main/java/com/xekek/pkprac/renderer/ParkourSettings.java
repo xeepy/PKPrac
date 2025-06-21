@@ -17,7 +17,7 @@
  */
 package com.xekek.pkprac.renderer;
 
-import com.xekek.pkprac.modules.Config;
+import com.xekek.pkprac.client.Config;
 
 public class ParkourSettings {
     public static boolean saveCheckpointOnActivation = true;

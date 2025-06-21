@@ -15,9 +15,11 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
-package com.xekek.pkprac.renderer;
+package com.xekek.pkprac.renderer.gui;
 
 import com.xekek.pkprac.modules.CPManager;
+
+import com.xekek.pkprac.renderer.GuiFilePicker;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.Minecraft;
