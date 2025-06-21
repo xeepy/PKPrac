@@ -148,31 +148,27 @@ public class Main
                         new BlockPos(maxX, y, maxZ)
                 };
 
-                boolean allAir = true;
                 boolean standingOnSomething = false;
-
                 for (BlockPos pos : positions) {
-                    boolean foundSolid = false;
-                    for (int i = -1; i <= 2; i++) {
-                        BlockPos checkPos = new BlockPos(pos.getX(), pos.getY() + i, pos.getZ());
-                        Block block = Minecraft.getMinecraft().theWorld.getBlockState(checkPos).getBlock();
-                        String name = block.getUnlocalizedName();
+                    for (int i = 0; i >= -1; i--) {
+                        BlockPos checkPos = pos.add(0, i, 0);
+                        IBlockState state = Minecraft.getMinecraft().theWorld.getBlockState(checkPos);
+                        Block block = state.getBlock();
 
-                        if (!name.contains("air")) {
-                            if (hasCollisionAtPlayerPosition(checkPos, PracticeMode.savedX, PracticeMode.savedZ)) {
-                                foundSolid = true;
-                                break;
-                            }
+                        AxisAlignedBB collisionBox = block.getCollisionBoundingBox(Minecraft.getMinecraft().theWorld, checkPos, state);
+                        if (collisionBox != null) {
+                            standingOnSomething = true;
+                            System.out.println("Solid block (collision box) detected at " + checkPos + " (" + block.getUnlocalizedName() + ")");
+                            break;
                         }
                     }
-
-                    if (foundSolid) {
-                        allAir = false;
-                        standingOnSomething = true;
+                    if (standingOnSomething) {
+                        break;
                     }
                 }
 
-                boolean blockBroken = allAir && !standingOnSomething;
+                boolean blockBroken = !standingOnSomething;
+
                 boolean wasHit = player.hurtTime > 0 && player.hurtTime != lastHurtTime;
                 boolean isDead = player.isDead || player.getHealth() <= 0;
 
@@ -237,12 +233,6 @@ public class Main
                         Block block = blockState.getBlock();
                         String blockName = block.getUnlocalizedName();
 
-                        if (block instanceof BlockStairs) {
-                            IBlockState state = Minecraft.getMinecraft().theWorld.getBlockState(pos);
-                            if (state.getValue(BlockStairs.HALF) == BlockStairs.EnumHalf.TOP) {
-                                // Ermm What the Reverse Stair
-                            }
-                        }
                         if (blockName.contains("trapdoor") || blockName.contains("door") ||
                             blockName.contains("button") || blockName.contains("lever") ||
                             blockName.contains("pressure") || blockName.contains("tripwire") ||
@@ -261,42 +251,4 @@ public class Main
         return states.toArray(new String[0]);
     }
 
-    private static boolean hasCollisionAtPlayerPosition(BlockPos blockPos, double playerX, double playerZ) {
-        if (Minecraft.getMinecraft().theWorld == null) {
-            return true;
-        }
-
-        try {
-            IBlockState blockState = Minecraft.getMinecraft().theWorld.getBlockState(blockPos);
-            Block block = blockState.getBlock();
-
-            AxisAlignedBB collisionBox = block.getCollisionBoundingBox(
-                Minecraft.getMinecraft().theWorld, blockPos, blockState);
-
-            if (collisionBox == null) {
-                return false;
-            }
-
-            double relativeX = playerX - blockPos.getX();
-            double relativeZ = playerZ - blockPos.getZ();
-
-            double boxMinX = collisionBox.minX - blockPos.getX();
-            double boxMaxX = collisionBox.maxX - blockPos.getX();
-            double boxMinZ = collisionBox.minZ - blockPos.getZ();
-            double boxMaxZ = collisionBox.maxZ - blockPos.getZ();
-
-            boolean xInBounds = relativeX >= boxMinX && relativeX <= boxMaxX;
-            boolean zInBounds = relativeZ >= boxMinZ && relativeZ <= boxMaxZ;
-
-            double playerRadius = 0.3;
-
-            boolean xOverlaps = (relativeX + playerRadius >= boxMinX) && (relativeX - playerRadius <= boxMaxX);
-            boolean zOverlaps = (relativeZ + playerRadius >= boxMinZ) && (relativeZ - playerRadius <= boxMaxZ);
-
-            return xOverlaps && zOverlaps;
-
-        } catch (Exception e) {
-            return true;
-        }
-    }
 }
