@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
-package com.xekek.pkprac.renderer;
+package com.xekek.pkprac.renderer.gui;
 
 import com.xekek.pkprac.modules.PracticeMode;
 import net.minecraft.client.Minecraft;

@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
-package com.xekek.pkprac.events;
+package com.xekek.pkprac.network;
 
 import com.xekek.pkprac.client.ChatCommands;
 import com.xekek.pkprac.modules.CPManager;

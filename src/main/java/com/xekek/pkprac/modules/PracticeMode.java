@@ -18,7 +18,7 @@
 package com.xekek.pkprac.modules;
 
 import com.xekek.pkprac.client.KeyHandler;
-import com.xekek.pkprac.events.Packets;
+import com.xekek.pkprac.network.Packets;
 import com.xekek.pkprac.renderer.Notifications;
 import com.xekek.pkprac.renderer.ParkourSettings;
 import com.xekek.pkprac.server.MarkerHandler;
@@ -43,14 +43,12 @@ public class PracticeMode {
     private static long lastToggleTime = 0;
 
 
-
     public static void togglePracticeMode() {
         long currentTime = System.currentTimeMillis();
         if (currentTime - lastToggleTime < 2000) {
             Notifications.add("You must wait 2 seconds before toggling practice mode again!", Notifications.NotificationType.WARNING);
             return;
         }
-        lastToggleTime = currentTime;
 
         double totalMotion = Math.abs(mc.thePlayer.motionX) + Math.abs(mc.thePlayer.motionZ);
 
@@ -75,6 +73,7 @@ public class PracticeMode {
 
         isEnabled = !isEnabled;
         if (isEnabled) {
+            lastToggleTime = currentTime;
             Notifications.add("Practice mode Enabled!", Notifications.NotificationType.SUCCESS);
             setPracticeMode();
         } else {

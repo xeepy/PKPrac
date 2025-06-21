@@ -15,10 +15,12 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
-package com.xekek.pkprac.renderer;
+package com.xekek.pkprac.renderer.gui;
 
 import com.xekek.pkprac.Main;
-import com.xekek.pkprac.modules.Config;
+import com.xekek.pkprac.client.Config;
+import com.xekek.pkprac.renderer.ParkourSettings;
+
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.renderer.GlStateManager;

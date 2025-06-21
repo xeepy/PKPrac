@@ -19,11 +19,14 @@ package com.xekek.pkprac;
 
 import com.xekek.pkprac.client.KeyHandler;
 import com.xekek.pkprac.events.EventHandler;
-import com.xekek.pkprac.events.Packets;
-import com.xekek.pkprac.modules.Config;
+import com.xekek.pkprac.client.Config;
 import com.xekek.pkprac.modules.PracticeMode;
+import com.xekek.pkprac.network.Packets;
 import com.xekek.pkprac.renderer.*;
 import com.xekek.pkprac.renderer.Beams;
+import com.xekek.pkprac.renderer.gui.GifRenderer;
+import com.xekek.pkprac.renderer.gui.GuiParkourSettings;
+
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;

@@ -15,13 +15,13 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
-package com.xekek.pkprac.modules;
+package com.xekek.pkprac.client;
 
 import java.io.*;
 
 import com.xekek.pkprac.Main;
-import com.xekek.pkprac.renderer.GifRenderer;
 import com.xekek.pkprac.renderer.ParkourSettings;
+
 import net.minecraft.client.Minecraft;
 
 public class Config {

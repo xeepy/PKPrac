@@ -18,6 +18,7 @@
 package com.xekek.pkprac.renderer;
 
 import com.xekek.pkprac.modules.CPManager;
+import com.xekek.pkprac.renderer.gui.GuiCheckpointEditor;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.Minecraft;
