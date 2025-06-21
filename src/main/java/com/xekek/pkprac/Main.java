@@ -17,7 +17,7 @@
  */
 package com.xekek.pkprac;
 
-import com.xekek.pkprac.client.BlockDetection;
+import com.xekek.pkprac.client.ResyncDetection;
 import com.xekek.pkprac.client.KeyHandler;
 import com.xekek.pkprac.events.EventHandler;
 import com.xekek.pkprac.client.Config;
@@ -28,20 +28,11 @@ import com.xekek.pkprac.renderer.Beams;
 import com.xekek.pkprac.renderer.gui.GifRenderer;
 import com.xekek.pkprac.renderer.gui.GuiParkourSettings;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockStairs;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.entity.EntityPlayerSP;
-import net.minecraft.util.AxisAlignedBB;
-import net.minecraft.util.BlockPos;
-import net.minecraft.util.EnumFacing;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.common.gameevent.TickEvent;
 import net.minecraftforge.fml.common.network.FMLNetworkEvent;
 
 
@@ -49,7 +40,7 @@ import net.minecraftforge.fml.common.network.FMLNetworkEvent;
 public class Main
 {
     public static final String MODID = "PKPrac";
-    public static final String VERSION = "1.0.2";
+    public static final String VERSION = "1.0.3-dev";
 
     private static GifRenderer gifRenderer;
     private static Notifications notificationSystem;
@@ -97,7 +88,7 @@ public class Main
         MinecraftForge.EVENT_BUS.register(new Packets());
         MinecraftForge.EVENT_BUS.register(new PracticeMode());
         MinecraftForge.EVENT_BUS.register(new EventHandler());
-        MinecraftForge.EVENT_BUS.register(new BlockDetection());
+        MinecraftForge.EVENT_BUS.register(new ResyncDetection());
         beams = new Beams();
 
         new KeyHandler();
