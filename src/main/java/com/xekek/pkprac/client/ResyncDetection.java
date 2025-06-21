@@ -63,7 +63,6 @@ public class ResyncDetection {
                 }
                 lastBlockStates = currentBlockStates;
 
-                System.out.println("Block states captured: " + currentBlockStates.length);
                 if (!needsResync && (blockBroken || wasHit || isDead || worldChanged || blockStateChanged)) {
                     PracticeMode.isEnabled = false;
                     PracticeMode.setPracticeMode();
