@@ -1,4 +1,4 @@
-name: Build PKPrac Mod 
+name: Build PKPrac Mod
 
 on:
   push:
@@ -41,8 +41,17 @@ jobs:
             ~/.gradle/wrapper
           key: gradle-${{ runner.os }}-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
 
-      # - name: Setup workspace
-      #   run: ./gradlew setupDecompWorkspace --no-daemon -Dorg.gradle.jvmargs="-Xmx3g -XX:MaxMetaspaceSize=512m"
+      - name: Cache setupDecompWorkspace
+        id: cache-setup-decomp-workspace
+        uses: actions/cache@v4
+        with:
+          path: |
+            .gradle
+          key: setup-decomp-workspace-${{ runner.os }}-${{ hashFiles('build.gradle') }}
+
+      - name: Setup workspace
+        if: steps.cache-setup-decomp-workspace.outputs.cache-hit != 'true'
+        run: ./gradlew setupDecompWorkspace --no-daemon -Dorg.gradle.jvmargs="-Xmx3g -XX:MaxMetaspaceSize=512m"
 
       - name: Build mod with Gradle
         run: ./gradlew build --stacktrace --info
