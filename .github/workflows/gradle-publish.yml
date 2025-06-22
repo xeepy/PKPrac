@@ -6,11 +6,13 @@ on:
       - 'src/**'
       - 'gradle/**'
       - 'gradlew*'
+      - '.github/workflows/gradle-publish.yml'
   pull_request:
     paths:
       - 'src/**'
       - 'gradle/**'
       - 'gradlew*'
+      - '.github/workflows/gradle-publish.yml'
   release:
     types: [published]
 
