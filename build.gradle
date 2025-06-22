@@ -131,6 +131,7 @@ reobf {
     shadowJar {}
 }
 
+
 jar {
     manifest.attributes(
         "FMLCorePlugin" : "com.xekek.pkprac.mixins.MixinLoader",
