@@ -33,6 +33,9 @@ jobs:
       - name: Make Gradle executable
         run: chmod +x ./gradlew
 
+      - name: Setup workspace
+        run: ./gradlew setupDecompWorkspace
+
       - name: Build mod with Gradle
         run: ./gradlew build --stacktrace --info
 
@@ -40,4 +43,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: pkprac-mod
-          path: build/libs/PKPrac-*.jar
+          path: build/libs/*.jar
