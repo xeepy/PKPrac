@@ -63,7 +63,6 @@ dependencies {
         exclude module: 'commons-io'
         exclude module: 'log4j-core'
     }
-
     if (systemOs.contains("mac")) {
         compile 'org.lwjgl.lwjgl:lwjgl_util:2.9.4-nightly-20150209'
         compile 'org.lwjgl.lwjgl:lwjgl:2.9.4-nightly-20150209'
@@ -73,30 +72,30 @@ dependencies {
         compile 'org.lwjgl.lwjgl:lwjgl:2.9.4-nightly-20150209'
         compile 'org.lwjgl.lwjgl:lwjgl-platform:2.9.4-nightly-20150209'
     }
+}
 
-    compile files('libs/DevAuth-forge-legacy-1.2.1.jar')
-
-    if (systemOs.contains("mac")) {
-        configurations.all {
-            resolutionStrategy {
-                dependencySubstitution {
-                    substitute module('org.lwjgl.lwjgl:lwjgl_util:2.9.2-nightly-201408222') with module('org.lwjgl.lwjgl:lwjgl_util:2.9.4-nightly-20150209')
-                    substitute module('org.lwjgl.lwjgl:lwjgl:2.9.2-nightly-201408222') with module('org.lwjgl.lwjgl:lwjgl:2.9.4-nightly-20150209')
-                }
-                force 'org.lwjgl.lwjgl:lwjgl-platform:2.9.4-nightly-20150209'
+if (systemOs.contains("mac")) {
+    configurations.all {
+        resolutionStrategy {
+            dependencySubstitution {
+                substitute module('org.lwjgl.lwjgl:lwjgl_util:2.9.2-nightly-201408222') with module('org.lwjgl.lwjgl:lwjgl_util:2.9.4-nightly-20150209')
+                substitute module('org.lwjgl.lwjgl:lwjgl:2.9.2-nightly-201408222') with module('org.lwjgl.lwjgl:lwjgl:2.9.4-nightly-20150209')
             }
-        }
-    } else if (systemOs.contains("linux")) {
-        configurations.all {
-            resolutionStrategy {
-                dependencySubstitution {
-                    substitute module('org.lwjgl.lwjgl:lwjgl_util:2.9.4-nightly-20150209') with module('org.lwjgl.lwjgl:lwjgl_util:2.9.4-nightly-20150209')
-                    substitute module('org.lwjgl.lwjgl:lwjgl:2.9.4-nightly-20150209') with module('org.lwjgl.lwjgl:lwjgl:2.9.4-nightly-20150209')
-                }
-                force 'org.lwjgl.lwjgl:lwjgl-platform:2.9.4-nightly-20150209'
-            }
+            force 'org.lwjgl.lwjgl:lwjgl-platform:2.9.4-nightly-20150209'
         }
     }
+} else if (systemOs.contains("linux")) {
+    configurations.all {
+        resolutionStrategy {
+            dependencySubstitution {
+                substitute module('org.lwjgl.lwjgl:lwjgl_util:2.9.4-nightly-20150209') with module('org.lwjgl.lwjgl:lwjgl_util:2.9.4-nightly-20150209')
+                substitute module('org.lwjgl.lwjgl:lwjgl:2.9.4-nightly-20150209') with module('org.lwjgl.lwjgl:lwjgl:2.9.4-nightly-20150209')
+            }
+            force 'org.lwjgl.lwjgl:lwjgl-platform:2.9.4-nightly-20150209'
+        }
+    }
+}
+
 
 processResources
 {
