@@ -6,8 +6,11 @@ import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
+import net.minecraft.client.multiplayer.ChunkProviderClient;
+import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.BlockPos;
+import net.minecraft.world.chunk.Chunk;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 
@@ -36,6 +39,34 @@ public class ResyncDetection {
             }
 
             if (PracticeMode.isPracticeModeEnabled()) {
+                WorldClient world = Minecraft.getMinecraft().theWorld;
+                BlockPos playerPos = player.getPosition();
+
+                int renderDistance = Minecraft.getMinecraft().gameSettings.renderDistanceChunks;
+                int anchorChunkX = (int) PracticeMode.savedX >> 4;
+                int anchorChunkZ = (int) PracticeMode.savedZ >> 4;
+
+                int minChunkX = anchorChunkX - renderDistance;
+                int maxChunkX = anchorChunkX + renderDistance;
+                int minChunkZ = anchorChunkZ - renderDistance;
+                int maxChunkZ = anchorChunkZ + renderDistance;
+
+                int playerChunkX = playerPos.getX() >> 4;
+                int playerChunkZ = playerPos.getZ() >> 4;
+
+                if (playerChunkX < minChunkX || playerChunkX > maxChunkX || playerChunkZ < minChunkZ || playerChunkZ > maxChunkZ) {
+                    PracticeMode.teleportToAnchor();
+                    Notifications.add("Exceeded render distance chunk limit! Teleporting back to anchor.", Notifications.NotificationType.WARNING);
+                    return;
+                }
+
+                Chunk chunk = world.getChunkFromBlockCoords(playerPos);
+                if (chunk == null || chunk.isEmpty()) {
+                    PracticeMode.teleportToAnchor();
+                    Notifications.add("Entered unloaded chunk! Teleporting back to anchor.", Notifications.NotificationType.WARNING);
+                    return;
+                }
+
                 boolean worldChanged = !firstTick && !currentWorldName.equals(lastWorldName);
                 AxisAlignedBB feetBB = new AxisAlignedBB(
                         savedBB.minX, savedBB.minY - 0.05, savedBB.minZ,

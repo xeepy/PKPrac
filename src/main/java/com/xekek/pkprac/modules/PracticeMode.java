@@ -154,4 +154,14 @@ public class PracticeMode {
             isFinishedResyncing = true;
         }
     }
+
+    public static void teleportToAnchor() {
+        EntityPlayerSP player = mc.thePlayer;
+        if (player != null) {
+            justTeleported = true;
+            player.setPosition(preciseX, preciseY, preciseZ);
+            player.prevRotationPitch = player.rotationPitch = precisePitch;
+            player.prevRotationYaw = player.rotationYaw = preciseYaw;
+        }
+    }
 }
