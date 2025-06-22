@@ -38,6 +38,8 @@ public class Packets {
     private int lastTick = -1;
     private static int practiceTickCounter = 0;
     private static boolean needsPositionSync = false;
+    private static boolean wasInPracticeMode = false;
+    private static boolean needsDisableSync = false;
 
     private static Minecraft mc = Minecraft.getMinecraft();
 
@@ -50,6 +52,7 @@ public class Packets {
 
                         EntityPlayerSP player = mc.thePlayer;
                         int currentTick = player != null ? player.ticksExisted : -1;
+
                         if (msg instanceof C03PacketPlayer && lastTick != currentTick) {
                             tickCounter++;
                             if (tickCounter >= 21) {
@@ -57,14 +60,24 @@ public class Packets {
                             }
                             lastTick = currentTick;
 
-                            if (PracticeMode.isPracticeModeEnabled()) {
+                            boolean currentlyInPractice = PracticeMode.isPracticeModeEnabled();
+
+                            if (wasInPracticeMode && !currentlyInPractice) {
+                                needsDisableSync = true;
+                                practiceTickCounter = 0;
+                            }
+
+                            if (currentlyInPractice) {
                                 practiceTickCounter++;
                                 if (practiceTickCounter >= 21) {
                                     practiceTickCounter = 0;
                                     needsPositionSync = true;
                                 }
                             }
+
+                            wasInPracticeMode = currentlyInPractice;
                         }
+
                         if (msg instanceof C01PacketChatMessage) {
                             String message = ((C01PacketChatMessage) msg).getMessage();
                             if (ChatCommands.handleChatCommand(message)) {
@@ -77,6 +90,7 @@ public class Packets {
                                 super.write(ctx, msg, promise);
                                 return;
                             }
+
                             if (msg instanceof C03PacketPlayer) {
                                 if (needsPositionSync) {
                                     super.write(ctx, new C03PacketPlayer.C04PacketPlayerPosition(
@@ -88,18 +102,22 @@ public class Packets {
                                 return;
                             }
 
-                            if (msg instanceof C0BPacketEntityAction || msg instanceof C13PacketPlayerAbilities || msg instanceof C09PacketHeldItemChange
-                                    || msg instanceof C0APacketAnimation
-                                    || msg instanceof C07PacketPlayerDigging
-                                    || msg instanceof C08PacketPlayerBlockPlacement
-                                    || msg instanceof S08PacketPlayerPosLook
-                                    || msg instanceof C02PacketUseEntity) {
+                            if (msg instanceof C0BPacketEntityAction || msg instanceof C13PacketPlayerAbilities ||
+                                    msg instanceof C09PacketHeldItemChange || msg instanceof C0APacketAnimation ||
+                                    msg instanceof C07PacketPlayerDigging || msg instanceof C08PacketPlayerBlockPlacement ||
+                                    msg instanceof S08PacketPlayerPosLook || msg instanceof C02PacketUseEntity) {
+                                return;
+                            }
+                        } else {
+                            if (needsDisableSync && msg instanceof C03PacketPlayer && player != null) {
+                                super.write(ctx, new C03PacketPlayer.C04PacketPlayerPosition(
+                                        player.posX, player.posY, player.posZ, player.onGround), promise);
+                                needsDisableSync = false;
                                 return;
                             }
                         }
 
                         super.write(ctx, msg, promise);
-
                     }
                 });
 
@@ -117,9 +135,9 @@ public class Packets {
                             }
 
                             double distance = Math.sqrt(
-                                Math.pow(packet.getX() - savedX, 2) +
-                                Math.pow(packet.getY() - savedY, 2) +
-                                Math.pow(packet.getZ() - savedZ, 2)
+                                    Math.pow(packet.getX() - savedX, 2) +
+                                            Math.pow(packet.getY() - savedY, 2) +
+                                            Math.pow(packet.getZ() - savedZ, 2)
                             );
 
                             if (distance > 1.0) {
@@ -131,13 +149,16 @@ public class Packets {
                         super.channelRead(ctx, msg);
                     }
                 });
+    }
 
-    }    @SubscribeEvent
+    @SubscribeEvent
     public void onClientDisconnect(FMLNetworkEvent.ClientDisconnectionFromServerEvent event) {
         tickCounter = 0;
         lastTick = -1;
         practiceTickCounter = 0;
         needsPositionSync = false;
+        wasInPracticeMode = false;
+        needsDisableSync = false;
     }
 
     public static void resetPracticeSync() {
