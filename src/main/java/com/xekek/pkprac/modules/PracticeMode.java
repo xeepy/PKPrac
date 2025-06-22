@@ -26,6 +26,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.util.AxisAlignedBB;
 
+import static com.xekek.pkprac.client.KeyHandler.flight;
 import static com.xekek.pkprac.client.KeyHandler.getKeyName;
 
 public class PracticeMode {
@@ -86,18 +87,21 @@ public class PracticeMode {
             Notifications.add("Practice mode Disabled!", Notifications.NotificationType.DISABLED);
             setPracticeMode();
         }
-    }    public static void setPracticeMode() {
+    }
+
+    public static void setPracticeMode() {
+        EntityPlayerSP player = mc.thePlayer;
+        if (player == null) {
+            return;
+        }
         if (isEnabled) {
-            EntityPlayerSP player = mc.thePlayer;
-            if (player != null) {
-                savedHotbarSlot = player.inventory.currentItem;
-                preciseX = savedX = player.posX;
-                preciseY = savedY = player.posY;
-                preciseZ = savedZ = player.posZ;
-                preciseYaw = savedYaw = player.rotationYaw;
-                precisePitch = savedPitch = player.rotationPitch;
-                savedBB = player.getEntityBoundingBox();
-            }
+            savedHotbarSlot = player.inventory.currentItem;
+            preciseX = savedX = player.posX;
+            preciseY = savedY = player.posY;
+            preciseZ = savedZ = player.posZ;
+            preciseYaw = savedYaw = player.rotationYaw;
+            precisePitch = savedPitch = player.rotationPitch;
+            savedBB = player.getEntityBoundingBox();
             if (ParkourSettings.saveCheckpointOnActivation) {
                 CPManager.saveCheckpoint(player);
             }
@@ -105,25 +109,25 @@ public class PracticeMode {
             Packets.resetPracticeSync();
 
         } else {
-            EntityPlayerSP player = mc.thePlayer;
-            if (player != null) {
-                justTeleported = true;
-                player.inventory.currentItem = savedHotbarSlot;
-                player.setPosition(preciseX, preciseY, preciseZ);
-                player.rotationPitch = precisePitch;
-                player.rotationYaw = preciseYaw;
-                player.prevRotationPitch = precisePitch;
-                player.prevRotationYaw = preciseYaw;
-                savedBB = null;
-                new Thread(() -> {
-                    try {
-                        Thread.sleep(150);
-                    } catch (InterruptedException e) {
-                        Thread.currentThread().interrupt();
-                    }
-                    justTeleported = false;
-                }).start();
+            justTeleported = true;
+            player.inventory.currentItem = savedHotbarSlot;
+            player.setPosition(preciseX, preciseY, preciseZ);
+            player.rotationPitch = precisePitch;
+            player.rotationYaw = preciseYaw;
+            player.prevRotationPitch = precisePitch;
+            player.prevRotationYaw = preciseYaw;
+            if(Flight.isFlying && !player.capabilities.isCreativeMode) {
+                Flight.Fly();
             }
+            savedBB = null;
+            new Thread(() -> {
+                try {
+                    Thread.sleep(150);
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                }
+                justTeleported = false;
+            }).start();
         }
     }
     public static void shutdown() {

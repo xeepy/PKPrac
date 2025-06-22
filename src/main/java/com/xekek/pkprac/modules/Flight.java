@@ -25,14 +25,16 @@ public class Flight {
     public static boolean isFlying = false;
 
     static Minecraft mc = Minecraft.getMinecraft();
-    //very useful comment
+
     public static void Fly() {
         if (isFlying) {
             isFlying = false;
+            mc.thePlayer.capabilities.allowFlying = false;
             mc.thePlayer.capabilities.isFlying = false;
             Notifications.add("Flight deactivated!", Notifications.NotificationType.ERROR);
         } else {
             isFlying = true;
+            mc.thePlayer.capabilities.allowFlying = true;
             mc.thePlayer.capabilities.isFlying = true;
             mc.thePlayer.motionY = 0.1;
             mc.thePlayer.onGround = false;
