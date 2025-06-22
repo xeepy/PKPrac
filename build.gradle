@@ -54,7 +54,7 @@ def systemOs = System.getProperty("os.name").toLowerCase(Locale.ENGLISH)
 
 dependencies {
     // DevAuth for development authentication (optional)
-    compile files('libs/DevAuth-forge-legacy-1.2.1.jar')
+//    compile files('libs/DevAuth-forge-legacy-1.2.1.jar')
 
     shade('org.spongepowered:mixin:0.7.10-SNAPSHOT') {
         exclude module: 'launchwrapper'
@@ -135,6 +135,7 @@ jar {
     manifest.attributes(
         "FMLCorePlugin" : "com.xekek.pkprac.mixins.MixinLoader",
         "ForceLoadAsMod": true,
+        "TweakClass": "org.spongepowered.asm.launch.MixinTweaker",
         "TweakOrder": 0,
         "ModSide": "CLIENT",
         'FMLCorePluginContainsFMLMod': true,
