@@ -31,4 +31,12 @@ public class PlayerControllerMPMixin {
             cir.cancel();
         }
     }
+
+    @Inject(method = "onPlayerDamageBlock", at = @At("HEAD"), cancellable = true)
+    private void onPlayerDamageBlock(BlockPos loc, EnumFacing face, CallbackInfoReturnable<Boolean> cir) {
+        if (PracticeMode.isPracticeModeEnabled()) {
+            cir.setReturnValue(false);
+            cir.cancel();
+        }
+    }
 }
