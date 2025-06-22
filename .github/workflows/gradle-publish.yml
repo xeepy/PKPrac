@@ -20,6 +20,8 @@ jobs:
   build:
     if: github.event_name != 'release'
     runs-on: ubuntu-latest
+    env:
+      GRADLE_OPTS: -Xmx3g -XX:MaxMetaspaceSize=512m
 
     steps:
       - uses: actions/checkout@v4
