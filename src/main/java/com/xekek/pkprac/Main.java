@@ -45,7 +45,7 @@ public class Main
     private static Notifications notificationSystem;
 
     Beams beams = new Beams();
-    
+
     public static float getGifScale() {
         if (gifRenderer != null) return gifRenderer.getScale();
         return ParkourSettings.gifScale;

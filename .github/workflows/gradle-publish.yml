@@ -35,13 +35,13 @@ jobs:
       - name: Make Gradle executable
         run: chmod +x ./gradlew
 
-      # - name: Cache Gradle Pls save me
-      #   uses: actions/cache@v4
-      #   with:
-      #     path: |
-      #       ~/.gradle/caches
-      #       ~/.gradle/wrapper
-      #     key: gradle-${{ runner.os }}-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+       - name: Cache Gradle Pls save me
+         uses: actions/cache@v4
+         with:
+           path: |
+             ~/.gradle/caches
+             ~/.gradle/wrapper
+           key: gradle-${{ runner.os }}-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
 
       # - name: Setup workspace
       #   run: ./gradlew setupDecompWorkspace --no-daemon -Dorg.gradle.jvmargs="-Xmx3g -XX:MaxMetaspaceSize=512m"

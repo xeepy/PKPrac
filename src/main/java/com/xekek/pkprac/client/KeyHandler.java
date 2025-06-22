@@ -38,13 +38,10 @@ public class KeyHandler {
 
     public static KeyBinding toggleKey = new KeyBinding("Toggle", Keyboard.KEY_G, "PKPrac");
     public static KeyBinding openSettingGui = new KeyBinding("Open Settings GUI", Keyboard.KEY_P, "PKPrac");
-
     public static KeyBinding loadCheckpoint = new KeyBinding("Load Checkpoint", Keyboard.KEY_R, "PKPrac");
     public static KeyBinding saveCheckpoint = new KeyBinding("Save Checkpoint", Keyboard.KEY_Z, "PKPrac");
-
     public static KeyBinding nextCheckpointKey = new KeyBinding("Next Checkpoint", Keyboard.KEY_F9, "PKPrac");
     public static KeyBinding prevCheckpointKey = new KeyBinding("Previous Checkpoint", Keyboard.KEY_F10, "PKPrac");
-
     public static KeyBinding flight = new KeyBinding("Practice Flight", Keyboard.KEY_F, "PKPrac");
 
     public KeyHandler() {
