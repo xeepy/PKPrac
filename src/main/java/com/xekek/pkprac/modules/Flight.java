@@ -25,7 +25,7 @@ public class Flight {
     public static boolean isFlying = false;
 
     static Minecraft mc = Minecraft.getMinecraft();
-
+    //very useful comment
     public static void Fly() {
         if (isFlying) {
             isFlying = false;
