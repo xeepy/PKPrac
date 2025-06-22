@@ -98,26 +98,26 @@ if (systemOs.contains("mac")) {
 
 
 processResources
-{
-    // this will ensure that this task is redone when the versions change.
-    inputs.property "version", project.version
-    inputs.property "mcversion", project.minecraft.version
+        {
+            // this will ensure that this task is redone when the versions change.
+            inputs.property "version", project.version
+            inputs.property "mcversion", project.minecraft.version
 
-    // replace stuff in mcmod.info, nothing else
-    from(sourceSets.main.resources.srcDirs) {
-        include 'mcmod.info'
+            // replace stuff in mcmod.info, nothing else
+            from(sourceSets.main.resources.srcDirs) {
+                include 'mcmod.info'
 
-        // replace version and mcversion
-        expand 'version':project.version, 'mcversion':project.minecraft.version
-    }
+                // replace version and mcversion
+                expand 'version':project.version, 'mcversion':project.minecraft.version
+            }
 
-    // copy everything else, thats not the mcmod.info
-    from(sourceSets.main.resources.srcDirs) {
-        exclude 'mcmod.info'
-    }
+            // copy everything else, thats not the mcmod.info
+            from(sourceSets.main.resources.srcDirs) {
+                exclude 'mcmod.info'
+            }
 
-    rename '(.+_at.cfg)', 'META-INF/$1'
-}
+            rename '(.+_at.cfg)', 'META-INF/$1'
+        }
 
 // Shadow plugin configuration
 shadowJar {
@@ -134,13 +134,13 @@ reobf {
 
 jar {
     manifest.attributes(
-        "FMLCorePlugin" : "com.xekek.pkprac.mixins.MixinLoader",
-        "ForceLoadAsMod": true,
-        "TweakClass": "org.spongepowered.asm.launch.MixinTweaker",
-        "TweakOrder": 0,
-        "ModSide": "CLIENT",
-        'FMLCorePluginContainsFMLMod': true,
-        'MixinConfigs': 'mixins.pkprac.json'
+            "FMLCorePlugin" : "com.xekek.pkprac.mixins.MixinLoader",
+            "ForceLoadAsMod": true,
+            "TweakClass": "org.spongepowered.asm.launch.MixinTweaker",
+            "TweakOrder": 0,
+            "ModSide": "CLIENT",
+            'FMLCorePluginContainsFMLMod': true,
+            'MixinConfigs': 'mixins.pkprac.json'
     )
 }
 
@@ -149,3 +149,9 @@ sourceSets {
         ext.refMap = "mixins.pkprac.refmap.json"
     }
 }
+task buildCopyToRunModsAndRun(type: Copy, dependsOn: 'build') {
+    from "build/libs"
+    into "run/mods"
+    include "*.jar"
+}
+buildCopyToRunModsAndRun.finalizedBy runClient
