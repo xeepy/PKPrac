@@ -64,12 +64,13 @@ public class Packets {
 
                             if (wasInPracticeMode && !currentlyInPractice) {
                                 needsDisableSync = true;
+                                
                                 practiceTickCounter = 0;
                             }
 
                             if (currentlyInPractice) {
                                 practiceTickCounter++;
-                                if (practiceTickCounter >= 21) {
+                                if (practiceTickCounter > 20) {
                                     practiceTickCounter = 0;
                                     needsPositionSync = true;
                                 }

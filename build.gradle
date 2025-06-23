@@ -23,7 +23,7 @@ apply plugin: 'org.spongepowered.mixin'
 
 // PKPrac - Parkour Practice Mod for Minecraft 1.8.9
 // Built with ForgeGradle 2.1 for compatibility
-version = "1.0.3"
+version = "1.0.4-dev"
 group= "com.xekek.pkprac" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = "PKPrac"
 sourceCompatibility = 1.8
