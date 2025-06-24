@@ -65,10 +65,6 @@ public class Packets {
                             if (currentlyInPractice) {
                                 practiceTickCounter++;
                                 if (practiceTickCounter > 20) {
-                                    int excess = practiceTickCounter - 20;
-                                    player.addChatComponentMessage(
-                                        new ChatComponentText(
-                                            "Warning: Sent " + excess + " excess packet" + (excess == 1 ? "" : "s") + " in 20 ticks."));
                                     practiceTickCounter = 0;
                                     needsPositionSync = true;
                                 }
