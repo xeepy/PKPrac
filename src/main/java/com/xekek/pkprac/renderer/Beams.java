@@ -32,7 +32,7 @@ public class Beams {
     @SubscribeEvent
     public void onRenderWorldLast(RenderWorldLastEvent event) {
         if (!PracticeMode.isPracticeModeEnabled()) return;
-        if (!!ParkourSettings.toggleBeams) return;
+        if (!ParkourSettings.toggleBeams) return;
         renderBeam(savedX, savedY, savedZ, 0.2f, 0.8f, 1.0f, 0.7f, event);
 
         if (CPManager.hasCheckpoints() && CPManager.checkpoints.get(CPManager.currentIndex) != null) {
