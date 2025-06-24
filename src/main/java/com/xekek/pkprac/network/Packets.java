@@ -26,6 +26,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.network.play.client.*;
 import net.minecraft.network.play.server.S08PacketPlayerPosLook;
+import net.minecraft.util.ChatComponentText;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.network.FMLNetworkEvent;
 
@@ -35,7 +36,7 @@ import static com.xekek.pkprac.modules.PracticeMode.*;
 public class Packets {
 
     public static int tickCounter = 0;
-    private int lastTick = -1;
+    private static int lastSent = -1;
     private static int practiceTickCounter = 0;
     private static boolean needsPositionSync = false;
     private static boolean wasInPracticeMode = false;
@@ -53,24 +54,21 @@ public class Packets {
                         EntityPlayerSP player = mc.thePlayer;
                         int currentTick = player != null ? player.ticksExisted : -1;
 
-                        if (msg instanceof C03PacketPlayer && lastTick != currentTick) {
-                            tickCounter++;
-                            if (tickCounter >= 21) {
-                                tickCounter = 0;
-                            }
-                            lastTick = currentTick;
-
+                        if (msg instanceof C03PacketPlayer) {
                             boolean currentlyInPractice = PracticeMode.isPracticeModeEnabled();
 
                             if (wasInPracticeMode && !currentlyInPractice) {
                                 needsDisableSync = true;
-                                
                                 practiceTickCounter = 0;
                             }
 
                             if (currentlyInPractice) {
                                 practiceTickCounter++;
                                 if (practiceTickCounter > 20) {
+                                    int excess = practiceTickCounter - 20;
+                                    player.addChatComponentMessage(
+                                        new ChatComponentText(
+                                            "Warning: Sent " + excess + " excess packet" + (excess == 1 ? "" : "s") + " in 20 ticks."));
                                     practiceTickCounter = 0;
                                     needsPositionSync = true;
                                 }
@@ -93,6 +91,10 @@ public class Packets {
                             }
 
                             if (msg instanceof C03PacketPlayer) {
+                                if (currentTick == lastSent) {
+                                    return;
+                                }
+                                lastSent = currentTick;
                                 if (needsPositionSync) {
                                     super.write(ctx, new C03PacketPlayer.C04PacketPlayerPosition(
                                             savedX, savedY, savedZ, true), promise);
@@ -154,8 +156,8 @@ public class Packets {
 
     @SubscribeEvent
     public void onClientDisconnect(FMLNetworkEvent.ClientDisconnectionFromServerEvent event) {
+        lastSent = -1;
         tickCounter = 0;
-        lastTick = -1;
         practiceTickCounter = 0;
         needsPositionSync = false;
         wasInPracticeMode = false;
