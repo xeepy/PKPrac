@@ -33,6 +33,7 @@ public class GuiCheckpointEditor extends GuiScreen {
     private final int perPage = 5;
     private int listStartY;
     private int listEntryHeight = 24;
+    private GuiSlider maxCpSlider;
 
     public GuiCheckpointEditor(GuiScreen parent) {
         this.parentScreen = parent;
@@ -59,24 +60,51 @@ public class GuiCheckpointEditor extends GuiScreen {
             this.buttonList.add(new GuiButton(200, centerX - 120, centerY + 60, 60, 20, "< Prev"));
         if ((page + 1) * perPage < CPManager.checkpoints.size())
             this.buttonList.add(new GuiButton(201, centerX + 60, centerY + 60, 60, 20, "Next >"));
+        this.buttonList.add(new GuiButton(1, (centerX - 120), centerY + 60 + 24, 60, 20, "Delete"));
+        this.buttonList.add(new GuiButton(2, (centerX - 120) + 60, centerY + 60 + 24, 60, 20, "Teleport"));
+        this.buttonList.add(new GuiButton(3, (centerX - 120) + 120, centerY + 60 + 24, 60, 20, "Up"));
+        this.buttonList.add(new GuiButton(4, (centerX - 120) + 180, centerY + 60 + 24, 60, 20, "Down"));
+        this.buttonList.add(new GuiButton(102, centerX - 120, (centerY + 60 + 24) + 22, 240, 20, "Done"));
+        this.buttonList.add(new GuiButton(100, centerX - 120, (centerY + 60 + 24) + 44, 120, 20, "Export"));
+        this.buttonList.add(new GuiButton(101, centerX, (centerY + 60 + 24) + 44, 120, 20, "Import"));
+        maxCpSlider = new GuiSlider(106, centerX - 120, (centerY + 60 + 24) + 66, 240, 20, 1, 100, CPManager.MaxCheckpoints);
+        this.buttonList.add(maxCpSlider);
+    }
 
-        this.buttonList.add(new GuiButton(1, centerX - 120, centerY + 90, 60, 20, "Delete"));
-        this.buttonList.add(new GuiButton(2, centerX - 50, centerY + 90, 60, 20, "Teleport"));
-        this.buttonList.add(new GuiButton(3, centerX + 20, centerY + 90, 40, 20, "Up"));
-        this.buttonList.add(new GuiButton(4, centerX + 65, centerY + 90, 40, 20, "Down"));
-        this.buttonList.add(new GuiButton(102, centerX - 120, centerY + 112, 240, 20, "Done"));
-        this.buttonList.add(new GuiButton(100, centerX - 120, centerY + 134, 115, 20, "Export"));
-        this.buttonList.add(new GuiButton(101, centerX + 5, centerY + 134, 115, 20, "Import"));
-        this.buttonList.add(new GuiButton(106, centerX - 120, centerY + 156, 240, 20, "Max Checkpoints: " + CPManager.MaxCheckpoints));
 
+    @Override
+    public void updateScreen() {
+        super.updateScreen();
+        if (maxCpSlider != null) {
+            CPManager.MaxCheckpoints = maxCpSlider.value;
+        }
+    }
+
+    @Override
+    protected void mouseClickMove(int mouseX, int mouseY, int clickedMouseButton, long timeSinceLastClick) {
+        super.mouseClickMove(mouseX, mouseY, clickedMouseButton, timeSinceLastClick);
+        for (GuiButton button : this.buttonList) {
+            if (button instanceof GuiSlider) {
+                GuiSlider slider = (GuiSlider) button;
+                if (slider.dragging) {
+                    slider.mouseDragged(this.mc, mouseX, mouseY);
+                }
+            }
+        }
+    }
+
+    @Override
+    protected void mouseReleased(int mouseX, int mouseY, int state) {
+        super.mouseReleased(mouseX, mouseY, state);
+        for (GuiButton button : this.buttonList) {
+            if (button instanceof GuiSlider) {
+                ((GuiSlider) button).mouseReleased(mouseX, mouseY);
+            }
+        }
     }
 
     @Override
     protected void actionPerformed(GuiButton button) throws IOException {
-        int centerX = this.width / 2;
-        int start = page * perPage;
-        int end = Math.min(CPManager.checkpoints.size(), start + perPage);
-
         if (button.id == 102) {
             this.mc.displayGuiScreen(parentScreen);
         } else if (button.id == 200 && page > 0) {
