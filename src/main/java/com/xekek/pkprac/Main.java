@@ -39,7 +39,7 @@ import net.minecraftforge.fml.common.network.FMLNetworkEvent;
 public class Main
 {
     public static final String MODID = "pkprac";
-    public static final String VERSION = "1.0.4-dev";
+    public static final String VERSION = "1.0.4";
 
     private static GifRenderer gifRenderer;
     private static Notifications notificationSystem;
