@@ -59,7 +59,13 @@ public class GifRenderer extends Gui
     {
         try
         {
-            ResourceLocation rl = new ResourceLocation(gifPath);
+            String[] parts = gifPath.split(":", 2);
+            ResourceLocation rl;
+            if (parts.length == 2) {
+                rl = new ResourceLocation(parts[0], parts[1]);
+            } else {
+                rl = new ResourceLocation(gifPath);
+            }
             InputStream gifStream = Minecraft.getMinecraft().getResourceManager().getResource(rl).getInputStream();
             if (gifStream == null)
             {
@@ -227,4 +233,6 @@ public class GifRenderer extends Gui
         GlStateManager.disableBlend();
     }
 }
+
+
 

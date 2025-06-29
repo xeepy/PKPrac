@@ -18,6 +18,7 @@
 package com.xekek.pkprac.mixins;
 
 import com.xekek.pkprac.modules.PracticeMode;
+import com.xekek.pkprac.util.BlockStateManager;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.multiplayer.PlayerControllerMP;
 import net.minecraft.client.multiplayer.WorldClient;
@@ -33,6 +34,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(PlayerControllerMP.class)
 public class PlayerControllerMPMixin {
 
+
     @Inject(method = "clickBlock", at = @At("HEAD"), cancellable = true)
     private void onClickBlock(BlockPos loc, EnumFacing face, CallbackInfoReturnable<Boolean> cir) {
         if (PracticeMode.isPracticeModeEnabled()) {
@@ -41,11 +43,23 @@ public class PlayerControllerMPMixin {
         }
     }
 
-    @Inject(method = "onPlayerRightClick", at = @At("HEAD"), cancellable = true)
+    @Inject(method = {"onPlayerRightClick"}, at = @At("HEAD"), cancellable = true)
     private void onPlayerRightClick(EntityPlayerSP player, WorldClient worldIn, ItemStack heldStack, BlockPos pos, EnumFacing side, Vec3 vec, CallbackInfoReturnable<Boolean> cir) {
-        if (PracticeMode.isPracticeModeEnabled()) {
-            cir.setReturnValue(false);
-            cir.cancel();
+        try {
+            if (PracticeMode.isPracticeModeEnabled()) {
+                if (pos != null && worldIn != null) {
+                    if (BlockStateManager.isTrapdoor(pos)) {
+                        BlockStateManager.toggleTrapdoorClient(pos);
+                        cir.setReturnValue(true);
+                        cir.cancel();
+                        return;
+                    }
+                }
+                cir.setReturnValue(false);
+                cir.cancel();
+            }
+        } catch (Exception e) {
+            System.err.println("[PKPrac] Error: " + e.getMessage());
         }
     }
 

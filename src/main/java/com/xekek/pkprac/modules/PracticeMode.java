@@ -17,17 +17,14 @@
  */
 package com.xekek.pkprac.modules;
 
-import com.xekek.pkprac.client.KeyHandler;
 import com.xekek.pkprac.network.Packets;
 import com.xekek.pkprac.renderer.Notifications;
 import com.xekek.pkprac.renderer.ParkourSettings;
 import com.xekek.pkprac.server.MarkerHandler;
+import com.xekek.pkprac.util.BlockStateManager;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.util.AxisAlignedBB;
-
-import static com.xekek.pkprac.client.KeyHandler.flight;
-import static com.xekek.pkprac.client.KeyHandler.getKeyName;
 
 public class PracticeMode {
 
@@ -86,6 +83,7 @@ public class PracticeMode {
             }
             Notifications.add("Practice mode Disabled!", Notifications.NotificationType.DISABLED);
             setPracticeMode();
+            BlockStateManager.restoreAll();
         }
     }
 
