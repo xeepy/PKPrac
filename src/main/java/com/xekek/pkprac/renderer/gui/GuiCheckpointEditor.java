@@ -67,7 +67,7 @@ public class GuiCheckpointEditor extends GuiScreen {
         this.buttonList.add(new GuiButton(102, centerX - 120, (centerY + 60 + 24) + 22, 240, 20, "Done"));
         this.buttonList.add(new GuiButton(100, centerX - 120, (centerY + 60 + 24) + 44, 120, 20, "Export"));
         this.buttonList.add(new GuiButton(101, centerX, (centerY + 60 + 24) + 44, 120, 20, "Import"));
-        maxCpSlider = new GuiSlider(106, centerX - 120, (centerY + 60 + 24) + 66, 240, 20, 1, 100, CPManager.MaxCheckpoints);
+        maxCpSlider = new GuiSlider(106, centerX - 120, (centerY + 60 + 24) + 66, 240, 20, 1, 100, "Max Checkpoints:", CPManager.MaxCheckpoints);
         this.buttonList.add(maxCpSlider);
     }
 

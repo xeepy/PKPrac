@@ -64,6 +64,7 @@ public class Main
         gifRenderer = new GifRenderer(
             GuiParkourSettings.getSelectedGifPath()
         );
+        gifRenderer.setScale(ParkourSettings.gifScale);
         net.minecraftforge.common.MinecraftForge.EVENT_BUS.register(gifRenderer);
     }
 
