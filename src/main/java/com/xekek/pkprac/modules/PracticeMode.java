@@ -99,13 +99,13 @@ public class PracticeMode {
             preciseZ = savedZ = player.posZ;
             preciseYaw = savedYaw = player.rotationYaw;
             precisePitch = savedPitch = player.rotationPitch;
+            player.sendQueue.addToSendQueue(new net.minecraft.network.play.client.C03PacketPlayer.C04PacketPlayerPosition(savedX, savedY, savedZ, player.onGround));
             savedBB = player.getEntityBoundingBox();
             if (ParkourSettings.saveCheckpointOnActivation) {
                 CPManager.saveCheckpoint(player);
             }
             isFinishedResyncing = false;
             Packets.resetPracticeSync();
-
         } else {
             justTeleported = true;
             player.inventory.currentItem = savedHotbarSlot;

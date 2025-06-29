@@ -26,21 +26,15 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.network.play.client.*;
 import net.minecraft.network.play.server.S08PacketPlayerPosLook;
-import net.minecraft.util.ChatComponentText;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.network.FMLNetworkEvent;
-
 
 import static com.xekek.pkprac.modules.PracticeMode.*;
 
 public class Packets {
 
-    public static int tickCounter = 0;
-    private static int lastSent = -1;
     private static int practiceTickCounter = 0;
     private static boolean needsPositionSync = false;
-    private static boolean wasInPracticeMode = false;
-    private static boolean needsDisableSync = false;
 
     private static Minecraft mc = Minecraft.getMinecraft();
 
@@ -50,27 +44,11 @@ public class Packets {
                 new ChannelOutboundHandlerAdapter() {
                     @Override
                     public void write(ChannelHandlerContext ctx, Object msg, ChannelPromise promise) throws Exception {
-
                         EntityPlayerSP player = mc.thePlayer;
-                        int currentTick = player != null ? player.ticksExisted : -1;
 
-                        if (msg instanceof C03PacketPlayer) {
-                            boolean currentlyInPractice = PracticeMode.isPracticeModeEnabled();
-
-                            if (wasInPracticeMode && !currentlyInPractice) {
-                                needsDisableSync = true;
-                                practiceTickCounter = 0;
-                            }
-
-                            if (currentlyInPractice) {
-                                practiceTickCounter++;
-                                if (practiceTickCounter > 20) {
-                                    practiceTickCounter = 0;
-                                    needsPositionSync = true;
-                                }
-                            }
-
-                            wasInPracticeMode = currentlyInPractice;
+                        if (player == null) {
+                            super.write(ctx, msg, promise);
+                            return;
                         }
 
                         if (msg instanceof C01PacketChatMessage) {
@@ -81,20 +59,13 @@ public class Packets {
                         }
 
                         if (PracticeMode.isPracticeModeEnabled()) {
-                            if (player == null) {
-                                super.write(ctx, msg, promise);
-                                return;
-                            }
-
                             if (msg instanceof C03PacketPlayer) {
-                                if (currentTick == lastSent) {
-                                    return;
-                                }
-                                lastSent = currentTick;
-                                if (needsPositionSync) {
+                                practiceTickCounter++;
+                                if (needsPositionSync || practiceTickCounter >= 21) {
                                     super.write(ctx, new C03PacketPlayer.C04PacketPlayerPosition(
                                             savedX, savedY, savedZ, true), promise);
                                     needsPositionSync = false;
+                                    practiceTickCounter = 0;
                                 } else {
                                     super.write(ctx, new C03PacketPlayer(true), promise);
                                 }
@@ -104,14 +75,7 @@ public class Packets {
                             if (msg instanceof C0BPacketEntityAction || msg instanceof C13PacketPlayerAbilities ||
                                     msg instanceof C09PacketHeldItemChange || msg instanceof C0APacketAnimation ||
                                     msg instanceof C07PacketPlayerDigging || msg instanceof C08PacketPlayerBlockPlacement ||
-                                    msg instanceof S08PacketPlayerPosLook || msg instanceof C02PacketUseEntity) {
-                                return;
-                            }
-                        } else {
-                            if (needsDisableSync && msg instanceof C03PacketPlayer && player != null) {
-                                super.write(ctx, new C03PacketPlayer.C04PacketPlayerPosition(
-                                        player.posX, player.posY, player.posZ, player.onGround), promise);
-                                needsDisableSync = false;
+                                    msg instanceof C02PacketUseEntity) {
                                 return;
                             }
                         }
@@ -124,7 +88,6 @@ public class Packets {
                 new ChannelInboundHandlerAdapter() {
                     @Override
                     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
-
                         if (msg instanceof S08PacketPlayerPosLook && PracticeMode.isPracticeModeEnabled()) {
                             S08PacketPlayerPosLook packet = (S08PacketPlayerPosLook) msg;
 
@@ -152,12 +115,8 @@ public class Packets {
 
     @SubscribeEvent
     public void onClientDisconnect(FMLNetworkEvent.ClientDisconnectionFromServerEvent event) {
-        lastSent = -1;
-        tickCounter = 0;
         practiceTickCounter = 0;
         needsPositionSync = false;
-        wasInPracticeMode = false;
-        needsDisableSync = false;
     }
 
     public static void resetPracticeSync() {
