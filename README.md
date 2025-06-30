@@ -1,5 +1,5 @@
 # HYPIXEL WARNING 
-One of our test accounts got banned while testing PKPrac. We're working on fixing it but for now **we strongly recommend avoiding Hypixel with this mod **until further notice
+One of our test accounts got banned while testing PKPrac. We're working on fixing it but for now **we strongly recommend avoiding Hypixel with this mod** until further notice
 
 
 # PKPrac - Parkour Practice Mod
